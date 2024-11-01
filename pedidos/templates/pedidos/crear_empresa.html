@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Empresa</title>
+</head>
+<body>
+    <h1>Crear Empresa</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Guardar</button>
+    </form>
+    <a href="{% url 'ver_empresas' %}">Ver Empresas</a>
+</body>
+</html>

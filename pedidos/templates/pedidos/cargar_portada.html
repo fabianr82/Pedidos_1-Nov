@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Cargar Portada</title>
+</head>
+<body>
+    <h1>Cargar Imagen de Portada</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Cargar Portada</button>
+    </form>
+</body>
+</html>

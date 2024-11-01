@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pedidos</title>
+</head>
+<body>
+    <h1>Pedidos</h1>
+    <ul>
+        {% for pedido in pedidos %}
+            <li>Pedido ID: {{ pedido.id }} - Cliente: {{ pedido.cliente.nombre }} - Producto: {{ pedido.producto.nombre }} - Estatus: {{ pedido.EstatusPed }}</li>
+        {% empty %}
+            <li>No hay pedidos registrados.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'crear_pedido' %}">Crear Pedido</a>
+</body>
+</html>

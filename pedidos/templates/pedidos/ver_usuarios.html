@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Usuarios del Sistema</title>
+</head>
+<body>
+    <h1>Usuarios del Sistema</h1>
+    <ul>
+        {% for usuario in usuarios %}
+            <li>{{ usuario.nombre }} - {{ usuario.usuario }}</li>
+        {% empty %}
+            <li>No hay usuarios registrados.</li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'crear_usuario' %}">Crear Usuario</a>
+</body>
+</html>
