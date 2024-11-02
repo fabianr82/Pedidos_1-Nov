@@ -11,6 +11,20 @@ def inicio(request):
     portada = Portada.objects.last()  # Obtener la última portada cargada
     return render(request, 'pedidos/inicio.html', {'portada': portada})
 
+# Vista para cargar una portada
+@login_required
+def cargar_portada(request):
+    if request.method == 'POST':
+        form = PortadaForm(request.POST, request.FILES)
+        if form.is_valid():
+            Portada.objects.all().delete()  # Eliminar portadas existentes si es necesario
+            form.save()
+            messages.success(request, "Portada cargada exitosamente.")
+            return redirect("inicio")
+    else:
+        form = PortadaForm()
+    return render(request, 'pedidos/cargar_portada.html', {'form': form})
+
 # Vista para el login
 def login_view(request):
     if request.method == "POST":
@@ -29,20 +43,6 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect("login")
-
-# Vista para cargar una portada
-@login_required
-def cargar_portada(request):
-    if request.method == 'POST':
-        form = PortadaForm(request.POST, request.FILES)
-        if form.is_valid():
-            Portada.objects.all().delete()  # Eliminar portadas existentes si es necesario
-            form.save()
-            messages.success(request, "Portada cargada exitosamente.")
-            return redirect("inicio")
-    else:
-        form = PortadaForm()
-    return render(request, 'pedidos/cargar_portada.html', {'form': form})
 
 # Vistas para la creación de entidades
 @login_required
@@ -125,3 +125,15 @@ def ver_productos(request):
 def ver_pedidos(request):
     pedidos = Pedido.objects.all()
     return render(request, 'pedidos/ver_pedidos.html', {'pedidos': pedidos})
+
+@login_required
+def enviar_mensajes(request):
+    if request.method == 'POST':
+        # Lógica para procesar los datos de los mensajes
+        mensaje = request.POST.get('mensaje')
+        # Agrega más lógica aquí si es necesario
+    return render(request, 'pedidos/enviar_mensajes.html', {})
+
+def productos(request):
+    return render(request, 'pedidos/productos.html')    
+

@@ -3,45 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <title>Página de Inicio</title>
+    {% load static %}
     <style>
-        .portada {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 0 auto;
+        body {
+            background-image: url("{% static 'portadas/portada.png' %}"); /* Ruta corregida */
+            background-size: cover; /* Hace que la imagen cubra toda la pantalla */
+            background-repeat: no-repeat;
+            background-position: center;
+            background-attachment: fixed; /* La imagen permanece fija al hacer scroll */
         }
-        .portada-container {
-            text-align: center;
-            margin-bottom: 20px;
+        .menu {
+            list-style-type: none;
+            padding: 0;
+        }
+        .menu li {
+            margin-bottom: 5px;
+        }
+        a {
+            text-decoration: none;
+            color: #0066cc;
+        }
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <h1>Bienvenido a la Plataforma</h1>
+    <h1>Bienvenid@s</h1>
     <p>Has iniciado sesión correctamente.</p>
 
-    {% if portada %}
-        <div class="portada-container">
-            <img src="{{ portada.imagen.url }}" alt="Imagen de Portada" class="portada">
-            <p>{{ portada.descripcion }}</p>
-        </div>
-    {% else %}
-        <p>No hay una portada cargada actualmente.</p>
-    {% endif %}
-
     <h2>Opciones</h2>
-    <ul>
+    <ul class="menu">
         <li><a href="{% url 'crear_cliente' %}">Crear Cliente</a></li>
         <li><a href="{% url 'crear_empresa' %}">Crear Empresa</a></li>
         <li><a href="{% url 'crear_pedido' %}">Crear Pedido</a></li>
         <li><a href="{% url 'crear_producto' %}">Crear Producto</a></li>
         <li><a href="{% url 'crear_usuario' %}">Crear Usuario</a></li>
+        <li><a href="{% url 'enviar_mensajes' %}">Enviar MSN WhatsApp</a></li>
         <li><a href="{% url 'ver_clientes' %}">Ver Clientes</a></li>
         <li><a href="{% url 'ver_empresas' %}">Ver Empresas</a></li>
         <li><a href="{% url 'ver_pedidos' %}">Ver Pedidos</a></li>
         <li><a href="{% url 'ver_productos' %}">Ver Productos</a></li>
         <li><a href="{% url 'ver_usuarios' %}">Ver Usuarios</a></li>
     </ul>
+
     <a href="{% url 'logout' %}">Cerrar Sesión</a>
 </body>
 </html>

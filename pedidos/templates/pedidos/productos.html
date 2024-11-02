@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <!-- <title>Ver Productos</title> -->
+    {% load static %}
+    <style>
+        .producto {
+            display: block;
+            width: 100%; /* Asegura que las imágenes ocupen todo el ancho del contenedor */
+            max-width: 600px; /* Ancho máximo para computadoras de escritorio */
+            margin: 20px auto; /* Centra las imágenes en la página */
+            height: auto; /* Mantiene la proporción de las imágenes */
+        }
+
+        /* Ajuste para dispositivos móviles */
+        @media (max-width: 768px) {
+            .producto {
+                max-width: 100%; /* Se ajusta al ancho completo del contenedor en pantallas pequeñas */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- <h1>Ver Productos</h1> -->
+
+    <!-- Mostrar las imágenes de manera vertical -->
+    <img src="{% static 'catalogo/1.png' %}" alt="Producto 1" class="producto">
+    <img src="{% static 'catalogo/2.png' %}" alt="Producto 2" class="producto">
+    <img src="{% static 'catalogo/3.png' %}" alt="Producto 3" class="producto">
+    <img src="{% static 'catalogo/4.png' %}" alt="Producto 4" class="producto">
+
+</body>
+</html>

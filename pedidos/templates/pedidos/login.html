@@ -3,21 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <title>Iniciar Sesión</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+            background-color: #e6f7ff; /* Color de fondo opcional */
+        }
+        .btn {
+            display: block;
+            width: 150px;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #0066cc;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #0052a3;
+        }
+        .login-container {
+            width: 300px;
+            padding: 20px;
+            background-color: #f1f1f1;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            width: 100%;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
 </head>
 <body>
-    <h1>Iniciar Sesión</h1>
-    {% if messages %}
-        {% for message in messages %}
-            <p style="color: red;">{{ message }}</p>
-        {% endfor %}
-    {% endif %}
-    <form method="post">
-        {% csrf_token %}
-        <label for="username">Usuario:</label>
-        <input type="text" name="username" required><br>
-        <label for="password">Contraseña:</label>
-        <input type="password" name="password" required><br>
-        <button type="submit">Iniciar Sesión</button>
-    </form>
+    <!-- Contenedor de inicio de sesión -->
+    <div class="login-container">
+        <h2>Iniciar Sesión</h2>
+        <form method="post">
+            {% csrf_token %}
+            <label for="username">Usuario:</label>
+            <input type="text" name="username" required>
+            <label for="password">Contraseña:</label>
+            <input type="password" name="password" required>
+            <button type="submit">Iniciar Sesión</button>
+        </form>
+    </div>
+
+    <!-- Botón de Productos -->
+    <a href="{% url 'productos' %}" class="btn">Ver Productos</a>
 </body>
 </html>

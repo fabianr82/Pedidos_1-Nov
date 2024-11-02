@@ -2,14 +2,70 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Cargar Portada</title>
+    <title>Página de Inicio</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-attachment: fixed;
+            {% if portada %}
+            background-image: url('{{ portada.imagen.url }}');
+            {% else %}
+            background-color: #f0f0f0; /* Color de fondo si no hay imagen */
+            {% endif %}
+        }
+        .content {
+            background-color: rgba(255, 255, 255, 0.8); /* Fondo semitransparente para texto */
+            padding: 20px;
+            margin: 20px;
+            border-radius: 8px;
+        }
+        h1, p {
+            text-align: center;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            text-align: center;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        a {
+            text-decoration: none;
+            color: #0066cc;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <h1>Cargar Imagen de Portada</h1>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Cargar Portada</button>
-    </form>
+    <div class="content">
+        <h1>Bienvenido a la Plataforma</h1>
+        <p>Has iniciado sesión correctamente.</p>
+
+        <h2>Opciones</h2>
+        <ul>
+            <li><a href="{% url 'crear_cliente' %}">Crear Cliente</a></li>
+            <li><a href="{% url 'crear_empresa' %}">Crear Empresa</a></li>
+            <li><a href="{% url 'crear_pedido' %}">Crear Pedido</a></li>
+            <li><a href="{% url 'crear_producto' %}">Crear Producto</a></li>
+            <li><a href="{% url 'crear_usuario' %}">Crear Usuario</a></li>
+            <li><a href="{% url 'cargar_portada' %}">Cargar Portada</a></li>
+            <li><a href="{% url 'ver_clientes' %}">Ver Clientes</a></li>
+            <li><a href="{% url 'ver_empresas' %}">Ver Empresas</a></li>
+            <li><a href="{% url 'ver_pedidos' %}">Ver Pedidos</a></li>
+            <li><a href="{% url 'ver_productos' %}">Ver Productos</a></li>
+            <li><a href="{% url 'ver_usuarios' %}">Ver Usuarios</a></li>
+        </ul>
+
+        <a href="{% url 'logout' %}">Cerrar Sesión</a>
+    </div>
 </body>
 </html>

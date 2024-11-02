@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Enviar Mensajes</title>
+</head>
+<body>
+    <h1>Enviar Mensajes</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="mensaje">Mensaje:</label>
+        <textarea id="mensaje" name="mensaje"></textarea>
+        <button type="submit">Enviar</button>
+    </form>
+</body>
+</html>
