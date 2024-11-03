@@ -45,17 +45,42 @@ class Producto(models.Model):
     marca = models.CharField(max_length=50)
     descripcion = models.TextField()
     valor_unitario = models.DecimalField(max_digits=10, decimal_places=2)
-    fecha_vencimiento = models.DateField()    
+    fecha_vencimiento = models.DateField()
 
     def __str__(self):
         return self.nombre
 
 class Pedido(models.Model):
+    nro_pedido = models.IntegerField(default=1)  # Campo para el número de pedido
+    item_pedido = models.IntegerField(default=1)  # Campo para el número de ítem
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    EstatusPed = models.CharField(max_length=20, choices=[('Solicitado', 'Solicitado'), ('Confirmado', 'Confirmado'), ('Entregado', 'Entregado')])
+    EstatusPed = models.CharField(max_length=20, choices=[
+        ('Solicitado', 'Solicitado'),
+        ('Confirmado', 'Confirmado'),
+        ('Entregado', 'Entregado')
+    ])
     cantidad = models.IntegerField(default=1)
     fecha_pedido = models.DateField(default=timezone.now)
+    
+    class Meta:
+        unique_together = ('nro_pedido', 'item_pedido')  # Restringe la unicidad combinada
+
+    def save(self, *args, **kwargs):
+        if not self.nro_pedido:
+            last_pedido = Pedido.objects.order_by('-nro_pedido').first()
+            self.nro_pedido = last_pedido.nro_pedido + 1 if last_pedido else 1
+
+        if not self.item_pedido:
+            # Generar un nuevo `item_pedido` basado en el número de ítems en el pedido actual
+            max_item = Pedido.objects.filter(nro_pedido=self.nro_pedido).count()
+            self.item_pedido = max_item + 1
+
+        super(Pedido, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"Pedido {self.id} - {self.estatus_pedido}"
+        return f"Pedido {self.id} - Cliente: {self.cliente.nombre} {self.cliente.apellido} - Producto: {self.producto.nombre}"
+
+    @property
+    def val_producto(self):
+        return self.producto.valor_unitario * self.cantidad

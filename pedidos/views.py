@@ -6,6 +6,7 @@ from django.contrib import messages
 from .forms import EmpresaForm, UserSistemForm, ClienteForm, ProductoForm, PedidoForm, PortadaForm
 from .models import Empresa, UserSistem, Cliente, Producto, Pedido, Portada
 import json
+from datetime import datetime
 
 # Vista para la página de inicio
 @login_required
@@ -93,14 +94,98 @@ def crear_producto(request):
 
 @login_required
 def crear_pedido(request):
+    productos_solicitados = request.session.get('productos_solicitados', [])
+    total_pedido = sum(producto['val_producto'] for producto in productos_solicitados)
+
     if request.method == 'POST':
-        form = PedidoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('ver_pedidos')
-    else:
-        form = PedidoForm()
-    return render(request, 'pedidos/crear_pedido.html', {'form': form})
+        if 'limpiar_productos' in request.POST:
+            request.session['productos_solicitados'] = []
+            messages.success(request, "Productos solicitados eliminados correctamente.")
+            return redirect('crear_pedido')
+
+        if 'eliminar_productos_seleccionados' in request.POST:
+            # Recibir los índices de las filas seleccionadas para eliminar
+            indices_a_eliminar = request.POST.getlist('eliminar_fila')
+            if indices_a_eliminar:
+                # Convertir los índices a enteros y eliminar en orden inverso para evitar problemas
+                indices_a_eliminar = sorted([int(i) for i in indices_a_eliminar], reverse=True)
+                for index in indices_a_eliminar:
+                    if 0 <= index < len(productos_solicitados):
+                        productos_solicitados.pop(index)
+                request.session['productos_solicitados'] = productos_solicitados
+                messages.success(request, "Productos seleccionados eliminados correctamente.")
+            
+            # Recalcular el total después de la eliminación
+            total_pedido = sum(producto['val_producto'] for producto in productos_solicitados)
+
+        elif 'agregar_producto' in request.POST:
+            producto_id = request.POST.get('producto')
+            cantidad = int(request.POST.get('cantidad', 1))
+
+            if producto_id and cantidad > 0:
+                producto = Producto.objects.get(id=producto_id)
+                val_producto = float(producto.valor_unitario) * cantidad
+
+                nro_pedido = request.session.get('nro_pedido', 1)
+                item_pedido = len(productos_solicitados) + 1
+
+                productos_solicitados.append({
+                    'id': producto.id,
+                    'nro_pedido': nro_pedido,
+                    'item_pedido': item_pedido,
+                    'nombre': producto.nombre,
+                    'marca': producto.marca,
+                    'descripcion': producto.descripcion,
+                    'valor_unitario': float(producto.valor_unitario),
+                    'cantidad': cantidad,
+                    'val_producto': val_producto,
+                    'fecha_pedido': datetime.now().strftime('%Y-%m-%d')
+                })
+                request.session['productos_solicitados'] = productos_solicitados
+                messages.success(request, "Producto agregado a la lista.")
+
+            total_pedido = sum(producto['val_producto'] for producto in productos_solicitados)
+
+        elif 'guardar_pedido' in request.POST:
+            cliente_id = request.POST.get('cliente')
+            estatus_pedido = request.POST.get('EstatusPed')
+            fecha_pedido = datetime.now().strftime('%Y-%m-%d')
+
+            if cliente_id and productos_solicitados:
+                cliente = Cliente.objects.get(id=cliente_id)
+
+                for producto_data in productos_solicitados:
+                    producto = Producto.objects.get(id=producto_data['id'])
+                    
+                    ultimo_pedido = Pedido.objects.filter(nro_pedido=producto_data['nro_pedido']).order_by('-item_pedido').first()
+                    item_pedido = (ultimo_pedido.item_pedido + 1) if ultimo_pedido else 1
+
+                    Pedido.objects.create(
+                        nro_pedido=producto_data['nro_pedido'],
+                        cliente=cliente,
+                        producto=producto,
+                        EstatusPed=estatus_pedido,
+                        cantidad=producto_data['cantidad'],
+                        fecha_pedido=fecha_pedido,
+                        item_pedido=item_pedido
+                    )
+
+                request.session['productos_solicitados'] = []
+                messages.success(request, "Pedido guardado correctamente.")
+                return redirect('inicio')
+
+    productos = Producto.objects.all()
+    clientes = Cliente.objects.all()
+    cliente_id = request.POST.get('cliente') if request.method == 'POST' else None
+    cliente = Cliente.objects.get(id=cliente_id) if cliente_id else None
+
+    return render(request, 'pedidos/crear_pedido.html', {
+        'productos': productos,
+        'clientes': clientes,
+        'productos_solicitados': productos_solicitados,
+        'total_pedido': total_pedido,
+        'cliente_seleccionado': cliente
+    })
 
 # Vistas para listar entidades
 @login_required
@@ -151,12 +236,10 @@ def enviar_mensajes(request):
 # Vista para la ubicación de clientes en Google Maps
 @login_required
 def ubicacion_clientes(request):
-    # Obtener todos los pedidos relacionados con los clientes
     pedidos = Pedido.objects.select_related('cliente', 'producto').all()
     clientes_data = []
 
     for pedido in pedidos:
-        # Agregar los datos del cliente y el pedido a la lista
         clientes_data.append({
             'nombre': f"{pedido.cliente.nombre} {pedido.cliente.apellido}",
             'coordenadas': pedido.cliente.coordenadas,
@@ -164,13 +247,29 @@ def ubicacion_clientes(request):
             'estatus_pedido': pedido.EstatusPed
         })
 
-    # Preparar el contexto para enviarlo al template
     context = {
         'clientes_json': json.dumps(clientes_data),
-        'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY  # Reemplaza con tu clave de API de Google Maps
+        'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY
     }
     return render(request, 'pedidos/ubicacion_clientes.html', context)
 
 @login_required
 def productos(request):
     return render(request, 'pedidos/productos.html')
+
+# Vistas para editar y eliminar productos en un pedido
+@login_required
+def editar_producto(request, nro_pedido, item_pedido):
+    producto = Pedido.objects.get(nro_pedido=nro_pedido, item_pedido=item_pedido)
+    if request.method == 'POST':
+        producto.cantidad = request.POST.get('cantidad')
+        producto.save()
+        return redirect('crear_pedido')
+
+    return render(request, 'pedidos/editar_producto.html', {'producto': producto})
+
+@login_required
+def eliminar_producto(request, nro_pedido, item_pedido):
+    producto = Pedido.objects.get(nro_pedido=nro_pedido, item_pedido=item_pedido)
+    producto.delete()
+    return redirect('crear_pedido')
