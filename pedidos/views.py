@@ -1,9 +1,11 @@
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import EmpresaForm, UserSistemForm, ClienteForm, ProductoForm, PedidoForm, PortadaForm
 from .models import Empresa, UserSistem, Cliente, Producto, Pedido, Portada
+import json
 
 # Vista para la página de inicio
 @login_required
@@ -126,14 +128,49 @@ def ver_pedidos(request):
     pedidos = Pedido.objects.all()
     return render(request, 'pedidos/ver_pedidos.html', {'pedidos': pedidos})
 
+# Vista para enviar mensajes
 @login_required
 def enviar_mensajes(request):
+    enlaces = []
     if request.method == 'POST':
-        # Lógica para procesar los datos de los mensajes
         mensaje = request.POST.get('mensaje')
-        # Agrega más lógica aquí si es necesario
-    return render(request, 'pedidos/enviar_mensajes.html', {})
+        clientes_ids = request.POST.getlist('clientes')
+        clientes = Cliente.objects.filter(id__in=clientes_ids)
 
+        for cliente in clientes:
+            if cliente.whatsapp:
+                enlace = f"https://wa.me/{cliente.whatsapp}?text={mensaje}"
+                enlaces.append(enlace)
+
+    clientes = Cliente.objects.all()
+    return render(request, 'pedidos/enviar_mensajes.html', {
+        'clientes': clientes,
+        'enlaces': enlaces
+    })
+
+# Vista para la ubicación de clientes en Google Maps
+@login_required
+def ubicacion_clientes(request):
+    # Obtener todos los pedidos relacionados con los clientes
+    pedidos = Pedido.objects.select_related('cliente', 'producto').all()
+    clientes_data = []
+
+    for pedido in pedidos:
+        # Agregar los datos del cliente y el pedido a la lista
+        clientes_data.append({
+            'nombre': f"{pedido.cliente.nombre} {pedido.cliente.apellido}",
+            'coordenadas': pedido.cliente.coordenadas,
+            'pedido_info': f"Pedido ID: {pedido.id}, Producto: {pedido.producto.nombre}, Cantidad: {pedido.cantidad}",
+            'estatus_pedido': pedido.EstatusPed
+        })
+
+    # Preparar el contexto para enviarlo al template
+    context = {
+        'clientes_json': json.dumps(clientes_data),
+        'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY  # Reemplaza con tu clave de API de Google Maps
+    }
+    return render(request, 'pedidos/ubicacion_clientes.html', context)
+
+@login_required
 def productos(request):
-    return render(request, 'pedidos/productos.html')    
-
+    return render(request, 'pedidos/productos.html')

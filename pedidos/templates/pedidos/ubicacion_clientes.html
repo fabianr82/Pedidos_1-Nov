@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ubicación Pedidos</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}"></script>
+    <script>
+        function initMap() {
+            var centro = { lat: 4.686997, lng: -74.056924 };  // Bogotá, Colombia
+
+            var map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 11,
+                center: centro
+            });
+
+            var clientes = JSON.parse('{{ clientes_json|escapejs }}');
+
+            clientes.forEach(function(cliente) {
+                var coords = cliente.coordenadas.split(',');
+                var latitud = parseFloat(coords[0].trim());
+                var longitud = parseFloat(coords[1].trim());
+
+                // Definir el ícono del marcador según el estatus del pedido
+                var iconUrl;
+                switch (cliente.estatus_pedido) {
+                    case 'Solicitado':
+                        iconUrl = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+                        break;
+                    case 'Confirmado':
+                        iconUrl = 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+                        break;
+                    case 'Entregado':
+                        iconUrl = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+                        break;
+                    default:
+                        iconUrl = 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png';
+                }
+
+                var marker = new google.maps.Marker({
+                    position: { lat: latitud, lng: longitud },
+                    map: map,
+                    title: cliente.nombre,
+                    icon: iconUrl
+                });
+
+                var infoWindow = new google.maps.InfoWindow({
+                    content: `<div>
+                                <strong>${cliente.nombre}</strong><br>
+                                Pedido: ${cliente.pedido_info}<br>
+                                Estatus: ${cliente.estatus_pedido}<br>
+                                <a href="https://www.google.com/maps/dir/?api=1&destination=${latitud},${longitud}" target="_blank">
+                                    Ver ruta en Google Maps
+                                </a>
+                              </div>`
+                });
+
+                marker.addListener('click', function() {
+                    infoWindow.open(map, marker);
+                });
+            });
+        }
+    </script>
+</head>
+<body onload="initMap()">
+    <h1>Ubicación Pedidos</h1>
+    <div id="map" style="height: 500px; width: 100%;"></div>
+</body>
+</html>

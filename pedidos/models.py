@@ -51,16 +51,11 @@ class Producto(models.Model):
         return self.nombre
 
 class Pedido(models.Model):
-    fecha_pedido = models.DateField(default=timezone.now)  # Establece la fecha actual como valor predeterminado
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    EstatusPed = models.CharField(max_length=20, choices=[
-        ('Solicitado', 'Solicitado'),
-        ('Confirmado', 'Confirmado'),
-        ('Entregado', 'Entregado')
-    ])
-    cantidad = models.IntegerField(default=1)  # Define un valor predeterminado
-
+    EstatusPed = models.CharField(max_length=20, choices=[('Solicitado', 'Solicitado'), ('Confirmado', 'Confirmado'), ('Entregado', 'Entregado')])
+    cantidad = models.IntegerField(default=1)
+    fecha_pedido = models.DateField(default=timezone.now)
 
     def __str__(self):
         return f"Pedido {self.id} - {self.estatus_pedido}"

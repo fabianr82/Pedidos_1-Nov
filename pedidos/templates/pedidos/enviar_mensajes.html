@@ -2,15 +2,61 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Enviar Mensajes</title>
+    <title>Enviar Mensajes por WhatsApp</title>
+    <script>
+        // Función para seleccionar o deseleccionar todos los checkboxes
+        function toggleSelectAll(checkbox) {
+            const checkboxes = document.querySelectorAll('input[name="clientes"]');
+            checkboxes.forEach((clienteCheckbox) => {
+                clienteCheckbox.checked = checkbox.checked;
+            });
+        }
+    </script>
 </head>
 <body>
-    <h1>Enviar Mensajes</h1>
-    <form method="post">
+    <h1>Enviar Mensajes WP</h1>
+    <form method="post" action="{% url 'enviar_mensajes' %}">
         {% csrf_token %}
-        <label for="mensaje">Mensaje:</label>
-        <textarea id="mensaje" name="mensaje"></textarea>
-        <button type="submit">Enviar</button>
+        
+        <!-- Campo de mensaje -->
+        <label for="mensaje">Mensaje:</label><br>
+        <textarea name="mensaje" id="mensaje" rows="4" cols="50" placeholder="Escribe el mensaje aquí" required></textarea><br><br>
+        
+        <!-- Casilla para seleccionar/deseleccionar todos -->
+        <label>
+            <input type="checkbox" onclick="toggleSelectAll(this)">
+            Seleccionar Todos
+        </label>
+        <br><br>
+        
+        <!-- Lista de selección de clientes -->
+        <label for="clientes">Seleccionar Clientes:</label><br>
+        {% for cliente in clientes %}
+            <input type="checkbox" name="clientes" value="{{ cliente.id }}">
+            {{ cliente.nombre }} {{ cliente.apellido }} - {{ cliente.whatsapp }}<br>
+        {% endfor %}
+        
+        <br>
+        <button type="submit">Generar Enlaces de Mensaje</button>
     </form>
+    
+    <!-- Mostrar los enlaces generados después de enviar el formulario -->
+    {% if enlaces %}
+        <h2>Enlaces para Enviar Mensajes:</h2>
+        <ul>
+            {% for enlace in enlaces %}
+                <li><a href="{{ enlace }}" target="_blank">{{ enlace }}</a> - <button onclick="copyToClipboard('{{ enlace }}')">Copiar</button></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <script>
+        // Función para copiar el enlace al portapapeles
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Enlace copiado al portapapeles");
+            });
+        }
+    </script>
 </body>
 </html>

@@ -15,6 +15,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# CLAVE API GOOGLE MAPS
+GOOGLE_MAPS_API_KEY = 'AIzaSyDEQafZcWfu0PjK-5uHQg6eHPW8FkdF50Y'
 
 # Application definition
 
