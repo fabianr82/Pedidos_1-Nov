@@ -4,31 +4,103 @@
     <meta charset="UTF-8">
     <title>Crear Pedido</title>
     <style>
-        /* Estilos opcionales para mejorar la apariencia */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .back-to-home {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-to-home:hover {
+            color: #45a049;
+        }
+
+        h1, h2, h3 {
+            color: #333;
+        }
+
+        form {
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        form input[type="text"],
+        form input[type="number"],
+        form select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
         table {
             width: 100%;
+            max-width: 1000px;
             border-collapse: collapse;
             margin-top: 20px;
         }
+
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px;
             text-align: left;
         }
+
         th {
             background-color: #f2f2f2;
+            color: #333;
+            font-weight: bold;
         }
-        h2, h3 {
-            margin-top: 20px;
-        }
+
         button {
-            background-color: transparent;
+            background-color: #4CAF50;
+            color: white;
             border: none;
+            padding: 10px 15px;
+            font-size: 1rem;
             cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
+    <!-- Botón de regreso a la página de inicio -->
+    <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
+
     <h1>Crear Pedido</h1>
     <form method="post">
         {% csrf_token %}
@@ -67,28 +139,30 @@
             <tr>
                 <th>Fecha del Pedido</th>
                 <th>Nro Pedido</th>
-                <th>Item Pedido</th>
+                <th>Item Producto</th>
                 <th>Nombre</th>
                 <th>Apellido</th>
                 <th>Nombre del Producto</th>
                 <th>Valor Unitario</th>
                 <th>Cantidad</th>
                 <th>Val Producto</th>
+                <th>Estatus del Pedido</th>
                 <th>Acciones</th>
             </tr>
             {% for producto in productos_solicitados %}
             <tr>
                 <td>{{ producto.fecha_pedido }}</td>
                 <td>{{ producto.nro_pedido }}</td>
-                <td>{{ producto.item_pedido }}</td>
+                <td>{{ producto.item_producto }}</td>
                 <td>{{ cliente_seleccionado.nombre }}</td>
                 <td>{{ cliente_seleccionado.apellido }}</td>
                 <td>{{ producto.nombre }}</td>
                 <td>{{ producto.valor_unitario }}</td>
                 <td>{{ producto.cantidad }}</td>
                 <td>{{ producto.val_producto }}</td>
+                <td>{{ producto.EstatusPed }}</td>
                 <td>
-                    <input type="checkbox" name="eliminar_fila" value="{{ forloop.counter0 }}"> <!-- Cuadro de check -->
+                    <input type="checkbox" name="eliminar_fila" value="{{ forloop.counter0 }}">
                 </td>
             </tr>
             {% endfor %}

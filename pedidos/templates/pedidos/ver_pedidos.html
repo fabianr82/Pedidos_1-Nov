@@ -2,17 +2,113 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Pedidos</title>
+    <title>Ver Pedidos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            max-width: 800px;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .actions a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .actions a:hover {
+            color: #0056b3;
+        }
+
+        .back-to-home {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-to-home:hover {
+            color: #45a049;
+        }
+    </style>
 </head>
 <body>
+    <!-- Enlace para regresar al inicio -->
+    <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
+
     <h1>Pedidos</h1>
-    <ul>
+
+    <table>
+        <tr>
+            <th>Pedido ID</th>
+            <th>Cliente</th>
+            <th>Producto</th>
+            <th>Estatus del Pedido</th>
+        </tr>
         {% for pedido in pedidos %}
-            <li>Pedido ID: {{ pedido.id }} - Cliente: {{ pedido.cliente.nombre }} - Producto: {{ pedido.producto.nombre }} - Estatus: {{ pedido.EstatusPed }}</li>
+        <tr>
+            <td>{{ pedido.id }}</td>
+            <td>{{ pedido.cliente.nombre }} {{ pedido.cliente.apellido }}</td>
+            <td>{{ pedido.producto.nombre }}</td>
+            <td>{{ pedido.EstatusPed }}</td>
+        </tr>
         {% empty %}
-            <li>No hay pedidos registrados.</li>
+        <tr>
+            <td colspan="4">No hay pedidos registrados.</td>
+        </tr>
         {% endfor %}
-    </ul>
-    <a href="{% url 'crear_pedido' %}">Crear Pedido</a>
+    </table>
+
+    <div class="actions">
+        <a href="{% url 'crear_pedido' %}">Crear Pedido</a>
+        <a href="{% url 'ver_productos' %}">Ver Productos</a>
+    </div>
 </body>
 </html>

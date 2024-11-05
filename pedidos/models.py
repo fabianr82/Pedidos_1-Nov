@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError 
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -44,11 +45,23 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=100)
     marca = models.CharField(max_length=50)
     descripcion = models.TextField()
+    UM = models.CharField(max_length=15, default='UND')  # Permitir valores personalizados
     valor_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_vencimiento = models.DateField()
+    item_producto = models.IntegerField(unique=True, default=1)
+
+    def clean(self):
+        # Verificar si `item_producto` ya existe
+        if Producto.objects.filter(item_producto=self.item_producto).exclude(pk=self.pk).exists():
+            raise ValidationError({'item_producto': 'El valor de Item Producto ya existe. Por favor, elige un valor diferente.'})
+
+    def save(self, *args, **kwargs):
+        # Llamar a `clean` para validar antes de guardar
+        self.full_clean()  # Ejecuta todas las validaciones, incluida `clean`
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} - Item: {self.item_producto}"
 
 class Pedido(models.Model):
     nro_pedido = models.IntegerField(default=1)  # Campo para el número de pedido
@@ -84,3 +97,4 @@ class Pedido(models.Model):
     @property
     def val_producto(self):
         return self.producto.valor_unitario * self.cantidad
+    

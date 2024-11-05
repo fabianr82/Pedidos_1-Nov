@@ -3,16 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <title>Clientes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .client-list {
+            width: 100%;
+            max-width: 600px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .client-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .client-item:last-child {
+            border-bottom: none;
+        }
+
+        .client-item strong {
+            font-weight: bold;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .actions a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .actions a:hover {
+            color: #0056b3;
+        }
+
+        .back-to-home {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-to-home:hover {
+            color: #45a049;
+        }
+    </style>
 </head>
 <body>
+    <!-- Icono para regresar al inicio -->
+    <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
+
     <h1>Clientes</h1>
-    <ul>
+
+    <div class="client-list">
         {% for cliente in clientes %}
-            <li>{{ cliente.nombre }} {{ cliente.apellido }} - {{ cliente.telefono }}</li>
+            <div class="client-item">
+                <strong>{{ cliente.nombre }} {{ cliente.apellido }}</strong> - {{ cliente.telefono }}
+            </div>
         {% empty %}
-            <li>No hay clientes registrados.</li>
+            <div class="client-item">No hay clientes registrados.</div>
         {% endfor %}
-    </ul>
-    <a href="{% url 'crear_cliente' %}">Crear Cliente</a>
+    </div>
+
+    <div class="actions">
+        <a href="{% url 'crear_cliente' %}">Crear Cliente</a>
+    </div>
 </body>
 </html>

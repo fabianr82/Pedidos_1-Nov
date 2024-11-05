@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import EmpresaForm, UserSistemForm, ClienteForm, ProductoForm, PedidoForm, PortadaForm
 from .models import Empresa, UserSistem, Cliente, Producto, Pedido, Portada
+from django.core.exceptions import ValidationError
 import json
 from datetime import datetime
 
@@ -81,16 +82,31 @@ def crear_cliente(request):
         form = ClienteForm()
     return render(request, 'pedidos/crear_cliente.html', {'form': form})
 
-@login_required
 def crear_producto(request):
     if request.method == 'POST':
-        form = ProductoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('ver_productos')
-    else:
-        form = ProductoForm()
-    return render(request, 'pedidos/crear_producto.html', {'form': form})
+        nombre = request.POST.get('nombre')
+        marca = request.POST.get('marca')
+        descripcion = request.POST.get('descripcion')
+        valor_unitario = request.POST.get('valor_unitario')
+        fecha_vencimiento = request.POST.get('fecha_vencimiento')
+        item_producto = request.POST.get('item_producto')
+        UM = request.POST.get('UM')  # Captura el valor del campo UM
+        
+        # Crea el producto con el valor de UM
+        Producto.objects.create(
+            nombre=nombre,
+            marca=marca,
+            descripcion=descripcion,
+            valor_unitario=valor_unitario,
+            fecha_vencimiento=fecha_vencimiento,
+            item_producto=item_producto,
+            UM=UM  # Guarda el valor de UM
+        )
+        
+        return redirect('crear_producto')
+
+    productos = Producto.objects.all()
+    return render(request, 'pedidos/crear_producto.html', {'productos': productos})
 
 @login_required
 def crear_pedido(request):
@@ -121,6 +137,7 @@ def crear_pedido(request):
         elif 'agregar_producto' in request.POST:
             producto_id = request.POST.get('producto')
             cantidad = int(request.POST.get('cantidad', 1))
+            estatus_pedido = request.POST.get('EstatusPed')
 
             if producto_id and cantidad > 0:
                 producto = Producto.objects.get(id=producto_id)
@@ -136,10 +153,12 @@ def crear_pedido(request):
                     'nombre': producto.nombre,
                     'marca': producto.marca,
                     'descripcion': producto.descripcion,
+                    'UM': producto.UM,
                     'valor_unitario': float(producto.valor_unitario),
                     'cantidad': cantidad,
                     'val_producto': val_producto,
-                    'fecha_pedido': datetime.now().strftime('%Y-%m-%d')
+                    'fecha_pedido': datetime.now().strftime('%Y-%m-%d'),
+                    'EstatusPed': estatus_pedido
                 })
                 request.session['productos_solicitados'] = productos_solicitados
                 messages.success(request, "Producto agregado a la lista.")
@@ -273,3 +292,21 @@ def eliminar_producto(request, nro_pedido, item_pedido):
     producto = Pedido.objects.get(nro_pedido=nro_pedido, item_pedido=item_pedido)
     producto.delete()
     return redirect('crear_pedido')
+
+@login_required
+def eliminar_productos(request):
+    if request.method == 'POST':
+        ids_para_eliminar = request.POST.getlist('suprimir')
+        Producto.objects.filter(id__in=ids_para_eliminar).delete()
+    return redirect('ver_productos')
+
+@login_required
+def eliminar_productos(request):
+    if request.method == "POST":
+        productos_a_eliminar = request.POST.getlist('suprimir[]')
+        if productos_a_eliminar:
+            Producto.objects.filter(id__in=productos_a_eliminar).delete()
+            messages.success(request, "Productos seleccionados eliminados correctamente.")
+        else:
+            messages.warning(request, "No seleccionaste ningún producto para eliminar.")
+    return redirect('crear_producto')

@@ -3,6 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <title>Ubicación Pedidos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        #map {
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .back-to-home {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-to-home:hover {
+            color: #45a049;
+        }
+    </style>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}"></script>
     <script>
         function initMap() {
@@ -62,7 +100,10 @@
     </script>
 </head>
 <body onload="initMap()">
+    <!-- Icono para regresar al inicio -->
+    <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
+    
     <h1>Ubicación Pedidos</h1>
-    <div id="map" style="height: 500px; width: 100%;"></div>
+    <div id="map"></div>
 </body>
 </html>

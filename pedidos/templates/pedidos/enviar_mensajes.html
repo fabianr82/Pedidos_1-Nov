@@ -3,60 +3,183 @@
 <head>
     <meta charset="UTF-8">
     <title>Enviar Mensajes por WhatsApp</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        .back-to-home {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-to-home:hover {
+            color: #45a049;
+        }
+
+        .form-container {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        form textarea,
+        form input[type="checkbox"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        form textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        form button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+            display: block;
+            width: 100%;
+        }
+
+        form button:hover {
+            background-color: #45a049;
+        }
+
+        .client-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .enlaces-list ul {
+            padding: 0;
+            list-style-type: none;
+        }
+
+        .enlaces-list li {
+            margin-bottom: 10px;
+        }
+
+        .enlaces-list a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .enlaces-list button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .enlaces-list button:hover {
+            background-color: #0056b3;
+        }
+    </style>
     <script>
-        // Función para seleccionar o deseleccionar todos los checkboxes
         function toggleSelectAll(checkbox) {
             const checkboxes = document.querySelectorAll('input[name="clientes"]');
             checkboxes.forEach((clienteCheckbox) => {
                 clienteCheckbox.checked = checkbox.checked;
             });
         }
-    </script>
-</head>
-<body>
-    <h1>Enviar Mensajes WP</h1>
-    <form method="post" action="{% url 'enviar_mensajes' %}">
-        {% csrf_token %}
-        
-        <!-- Campo de mensaje -->
-        <label for="mensaje">Mensaje:</label><br>
-        <textarea name="mensaje" id="mensaje" rows="4" cols="50" placeholder="Escribe el mensaje aquí" required></textarea><br><br>
-        
-        <!-- Casilla para seleccionar/deseleccionar todos -->
-        <label>
-            <input type="checkbox" onclick="toggleSelectAll(this)">
-            Seleccionar Todos
-        </label>
-        <br><br>
-        
-        <!-- Lista de selección de clientes -->
-        <label for="clientes">Seleccionar Clientes:</label><br>
-        {% for cliente in clientes %}
-            <input type="checkbox" name="clientes" value="{{ cliente.id }}">
-            {{ cliente.nombre }} {{ cliente.apellido }} - {{ cliente.whatsapp }}<br>
-        {% endfor %}
-        
-        <br>
-        <button type="submit">Generar Enlaces de Mensaje</button>
-    </form>
-    
-    <!-- Mostrar los enlaces generados después de enviar el formulario -->
-    {% if enlaces %}
-        <h2>Enlaces para Enviar Mensajes:</h2>
-        <ul>
-            {% for enlace in enlaces %}
-                <li><a href="{{ enlace }}" target="_blank">{{ enlace }}</a> - <button onclick="copyToClipboard('{{ enlace }}')">Copiar</button></li>
-            {% endfor %}
-        </ul>
-    {% endif %}
 
-    <script>
-        // Función para copiar el enlace al portapapeles
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
                 alert("Enlace copiado al portapapeles");
             });
         }
     </script>
+</head>
+<body>
+    <!-- Icono para regresar al inicio -->
+    <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
+
+    <h1>Enviar Mensajes por WhatsApp</h1>
+    <div class="form-container">
+        <form method="post" action="{% url 'enviar_mensajes' %}">
+            {% csrf_token %}
+            
+            <!-- Campo de mensaje -->
+            <label for="mensaje">Mensaje:</label>
+            <textarea name="mensaje" id="mensaje" rows="4" placeholder="Escribe el mensaje aquí" required></textarea>
+            
+            <!-- Casilla para seleccionar/deseleccionar todos -->
+            <label>
+                <input type="checkbox" onclick="toggleSelectAll(this)">
+                Seleccionar Todos
+            </label>
+
+            <!-- Lista de selección de clientes -->
+            <div class="client-list">
+                <label for="clientes">Seleccionar Clientes:</label>
+                {% for cliente in clientes %}
+                    <div>
+                        <input type="checkbox" name="clientes" value="{{ cliente.id }}">
+                        {{ cliente.nombre }} {{ cliente.apellido }} - {{ cliente.whatsapp }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit">Generar Enlaces de Mensaje</button>
+        </form>
+    </div>
+
+    <!-- Mostrar los enlaces generados después de enviar el formulario -->
+    {% if enlaces %}
+        <div class="enlaces-list">
+            <h2>Enlaces para Enviar Mensajes:</h2>
+            <ul>
+                {% for enlace in enlaces %}
+                    <li>
+                        <a href="{{ enlace }}" target="_blank">{{ enlace }}</a>
+                        <button onclick="copyToClipboard('{{ enlace }}')">Copiar</button>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
 </body>
 </html>

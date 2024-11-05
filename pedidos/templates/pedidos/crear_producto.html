@@ -3,14 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <title>Crear Producto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        .back-to-home {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-to-home:hover {
+            color: #45a049;
+        }
+
+        form {
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        form input[type="text"],
+        form input[type="number"],
+        form input[type="date"],
+        form textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        form textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        form button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+            display: block;
+            width: 100%;
+        }
+
+        form button:hover {
+            background-color: #45a049;
+        }
+
+        table {
+            width: 100%;
+            max-width: 800px;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .actions a, .actions button {
+            color: #007bff;
+            text-decoration: none;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .actions button {
+            background-color: transparent;
+            border: none;
+            color: #007bff;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .actions button:hover,
+        .actions a:hover {
+            color: #0056b3;
+        }
+    </style>
 </head>
 <body>
+    <!-- Icono para regresar al inicio -->
+    <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
+
     <h1>Crear Producto</h1>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Guardar</button>
+        
+        <label for="nombre">Nombre:</label>
+        <input type="text" name="nombre" id="nombre" required>
+
+        <label for="marca">Marca:</label>
+        <input type="text" name="marca" id="marca" required>
+
+        <label for="descripcion">Descripción:</label>
+        <textarea name="descripcion" id="descripcion"></textarea>
+
+        <label for="valor_unitario">Valor unitario:</label>
+        <input type="number" name="valor_unitario" id="valor_unitario" required>
+
+        <label for="fecha_vencimiento">Fecha vencimiento:</label>
+        <input type="date" name="fecha_vencimiento" id="fecha_vencimiento" required>
+
+        <label for="item_producto">Item Producto:</label>
+        <input type="number" name="item_producto" id="item_producto" required>
+
+        <label for="UM">Unidad de Medida (UM):</label>
+        <input type="text" name="UM" id="UM" maxlength="15" required>
+
+        <button type="submit">Guardar Producto</button>        
     </form>
-    <a href="{% url 'ver_productos' %}">Ver Productos</a>
+
+    <h2>Productos Existentes</h2>
+    <form method="post" action="{% url 'eliminar_productos' %}">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <th>Item Producto</th>
+                <th>Nombre</th>
+                <th>Marca</th>
+                <th>Descripción</th>
+                <th>UM</th>
+                <th>Valor Unitario</th>
+                <th>Fecha de Vencimiento</th>
+                <th>Suprimir</th>
+            </tr>
+            {% for producto in productos %}
+            <tr>
+                <td>{{ producto.item_producto }}</td>
+                <td>{{ producto.nombre }}</td>
+                <td>{{ producto.marca }}</td>
+                <td>{{ producto.descripcion }}</td>
+                <td>{{ producto.UM }}</td>
+                <td>${{ producto.valor_unitario }}</td>
+                <td>{{ producto.fecha_vencimiento|date:"d/m/Y" }}</td>
+                <td><input type="checkbox" name="suprimir[]" value="{{ producto.id }}"></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8">No hay productos registrados.</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div class="actions">
+            <button type="submit">Eliminar Productos Seleccionados</button>
+            <a href="{% url 'ver_productos' %}">Ver Productos</a>
+        </div>
+    </form>
 </body>
 </html>

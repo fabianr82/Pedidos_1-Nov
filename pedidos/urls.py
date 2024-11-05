@@ -9,7 +9,10 @@ urlpatterns = [
     path('crear_empresa/', views.crear_empresa, name='crear_empresa'),
     path('crear_usuario/', views.crear_user_sist, name='crear_usuario'),
     path('crear_cliente/', views.crear_cliente, name='crear_cliente'),
+
     path('crear_producto/', views.crear_producto, name='crear_producto'),
+    path('eliminar_productos/', views.eliminar_productos, name='eliminar_productos'),
+
     path('crear_pedido/', views.crear_pedido, name='crear_pedido'),
     path('ver_empresas/', views.ver_empresas, name='ver_empresas'),
     path('ver_usuarios/', views.ver_usuarios, name='ver_usuarios'),
@@ -18,6 +21,9 @@ urlpatterns = [
     path('ver_pedidos/', views.ver_pedidos, name='ver_pedidos'),
     path('enviar_mensajes/', views.enviar_mensajes, name='enviar_mensajes'),
     path('ubicacion_clientes/', views.ubicacion_clientes, name='ubicacion_clientes'),
+
+    path('editar_producto/<int:id>/', views.editar_producto, name='editar_producto'),
+    path('eliminar_productos/', views.eliminar_productos, name='eliminar_productos'),
 
     path('inicio/editar_producto/<int:nro_pedido>/<int:item_pedido>/', views.editar_producto, name='editar_producto'),
     path('inicio/eliminar_producto/<int:nro_pedido>/<int:item_pedido>/', views.eliminar_producto, name='eliminar_producto'),
