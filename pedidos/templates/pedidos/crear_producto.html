@@ -14,7 +14,7 @@
             align-items: center;
         }
 
-        h1, h2 {
+        h1 {
             color: #333;
         }
 
@@ -32,9 +32,9 @@
             color: #45a049;
         }
 
-        form {
+        .form-container {
             background-color: #fff;
-            border-radius: 5px;
+            border-radius: 8px;
             padding: 20px;
             width: 100%;
             max-width: 600px;
@@ -52,6 +52,7 @@
         form input[type="text"],
         form input[type="number"],
         form input[type="date"],
+        form select,
         form textarea {
             width: 100%;
             padding: 8px;
@@ -59,11 +60,6 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 1rem;
-        }
-
-        form textarea {
-            resize: vertical;
-            min-height: 80px;
         }
 
         form button {
@@ -82,51 +78,6 @@
         form button:hover {
             background-color: #45a049;
         }
-
-        table {
-            width: 100%;
-            max-width: 800px;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-            color: #333;
-            font-weight: bold;
-        }
-
-        .actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        .actions a, .actions button {
-            color: #007bff;
-            text-decoration: none;
-            margin-right: 10px;
-            font-weight: bold;
-        }
-
-        .actions button {
-            background-color: transparent;
-            border: none;
-            color: #007bff;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-
-        .actions button:hover,
-        .actions a:hover {
-            color: #0056b3;
-        }
     </style>
 </head>
 <body>
@@ -134,69 +85,43 @@
     <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
 
     <h1>Crear Producto</h1>
-    <form method="post">
-        {% csrf_token %}
-        
-        <label for="nombre">Nombre:</label>
-        <input type="text" name="nombre" id="nombre" required>
+    
+    <div class="form-container">
+        <form method="post">
+            {% csrf_token %}
 
-        <label for="marca">Marca:</label>
-        <input type="text" name="marca" id="marca" required>
+            <label for="nombre">Nombre:</label>
+            <input type="text" name="nombre" id="nombre" required>
 
-        <label for="descripcion">Descripción:</label>
-        <textarea name="descripcion" id="descripcion"></textarea>
+            <label for="marca">Marca:</label>
+            <input type="text" name="marca" id="marca" required>
 
-        <label for="valor_unitario">Valor unitario:</label>
-        <input type="number" name="valor_unitario" id="valor_unitario" required>
+            <label for="descripcion">Descripción:</label>
+            <textarea name="descripcion" id="descripcion"></textarea>
 
-        <label for="fecha_vencimiento">Fecha vencimiento:</label>
-        <input type="date" name="fecha_vencimiento" id="fecha_vencimiento" required>
+            <label for="item_empresa">Item Empresa:</label>
+            <select name="item_empresa" id="item_empresa" required>
+                {% for empresa in empresas %}
+                    <option value="{{ empresa.id }}">{{ empresa.nombre }} - {{ empresa.item_empresa }}</option>
+                {% endfor %}
+            </select>
 
-        <label for="item_producto">Item Producto:</label>
-        <input type="number" name="item_producto" id="item_producto" required>
+            <label for="valor_unitario">Valor unitario:</label>
+            <input type="number" name="valor_unitario" id="valor_unitario" required>
 
-        <label for="UM">Unidad de Medida (UM):</label>
-        <input type="text" name="UM" id="UM" maxlength="15" required>
+            <label for="fecha_vencimiento">Fecha de Vencimiento:</label>
+            <input type="date" name="fecha_vencimiento" id="fecha_vencimiento" required>
 
-        <button type="submit">Guardar Producto</button>        
-    </form>
+            <label for="item_producto">Item Producto:</label>
+            <input type="number" name="item_producto" id="item_producto" required>
 
-    <h2>Productos Existentes</h2>
-    <form method="post" action="{% url 'eliminar_productos' %}">
-        {% csrf_token %}
-        <table>
-            <tr>
-                <th>Item Producto</th>
-                <th>Nombre</th>
-                <th>Marca</th>
-                <th>Descripción</th>
-                <th>UM</th>
-                <th>Valor Unitario</th>
-                <th>Fecha de Vencimiento</th>
-                <th>Suprimir</th>
-            </tr>
-            {% for producto in productos %}
-            <tr>
-                <td>{{ producto.item_producto }}</td>
-                <td>{{ producto.nombre }}</td>
-                <td>{{ producto.marca }}</td>
-                <td>{{ producto.descripcion }}</td>
-                <td>{{ producto.UM }}</td>
-                <td>${{ producto.valor_unitario }}</td>
-                <td>{{ producto.fecha_vencimiento|date:"d/m/Y" }}</td>
-                <td><input type="checkbox" name="suprimir[]" value="{{ producto.id }}"></td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="8">No hay productos registrados.</td>
-            </tr>
-            {% endfor %}
-        </table>
+            <label for="UM">Unidad de Medida (UM):</label>
+            <input type="text" name="UM" id="UM" maxlength="15" required>
 
-        <div class="actions">
-            <button type="submit">Eliminar Productos Seleccionados</button>
-            <a href="{% url 'ver_productos' %}">Ver Productos</a>
-        </div>
-    </form>
+            <button type="submit">Guardar Producto</button>
+        </form>
+    </div>
+
+    <a href="{% url 'ver_productos' %}" class="back-to-home">📦 Ver Productos</a>
 </body>
 </html>

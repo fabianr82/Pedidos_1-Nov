@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -48,17 +48,25 @@ def logout_view(request):
     logout(request)
     return redirect("login")
 
-# Vistas para la creación de entidades
+# # Vista para crear una empresa
 @login_required
 def crear_empresa(request):
     if request.method == 'POST':
-        form = EmpresaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('ver_empresas')
-    else:
-        form = EmpresaForm()
-    return render(request, 'pedidos/crear_empresa.html', {'form': form})
+        nombre = request.POST.get('nombre')
+        direccion = request.POST.get('direccion')
+        telefono = request.POST.get('telefono')
+        item_empresa = request.POST.get('item_empresa')
+
+        Empresa.objects.create(
+            nombre=nombre,
+            direccion=direccion,
+            telefono=telefono,
+            item_empresa=item_empresa
+        )
+        messages.success(request, "Empresa creada exitosamente.")
+        return redirect('ver_empresas')
+
+    return render(request, 'pedidos/crear_empresa.html')
 
 @login_required
 def crear_user_sist(request):
@@ -91,9 +99,14 @@ def crear_producto(request):
         fecha_vencimiento = request.POST.get('fecha_vencimiento')
         item_producto = request.POST.get('item_producto')
         UM = request.POST.get('UM')  # Captura el valor del campo UM
+        empresa_id = request.POST.get('item_empresa')  # Captura el ID de la empresa seleccionada
         
-        # Crea el producto con el valor de UM
+        # Busca la empresa en base al item_empresa proporcionado
+        empresa = Empresa.objects.get(id=empresa_id)
+
+        # Crea el producto con el valor de UM y la empresa asociada
         Producto.objects.create(
+            empresa=empresa,  # Asigna la instancia de Empresa aquí
             nombre=nombre,
             marca=marca,
             descripcion=descripcion,
@@ -103,10 +116,13 @@ def crear_producto(request):
             UM=UM  # Guarda el valor de UM
         )
         
-        return redirect('crear_producto')
+        return render(request, 'pedidos/crear_producto.html')
 
     productos = Producto.objects.all()
-    return render(request, 'pedidos/crear_producto.html', {'productos': productos})
+    empresas = Empresa.objects.all()
+    return render(request, 'pedidos/crear_producto.html', {
+        'productos': productos,
+        'empresas': empresas})
 
 @login_required
 def crear_pedido(request):
@@ -135,6 +151,7 @@ def crear_pedido(request):
             total_pedido = sum(producto['val_producto'] for producto in productos_solicitados)
 
         elif 'agregar_producto' in request.POST:
+            item_empresa = request.POST.get('item_empresa')
             producto_id = request.POST.get('producto')
             cantidad = int(request.POST.get('cantidad', 1))
             estatus_pedido = request.POST.get('EstatusPed')
@@ -142,13 +159,14 @@ def crear_pedido(request):
             if producto_id and cantidad > 0:
                 producto = Producto.objects.get(id=producto_id)
                 val_producto = float(producto.valor_unitario) * cantidad
-
                 nro_pedido = request.session.get('nro_pedido', 1)
                 item_pedido = len(productos_solicitados) + 1
+                empresa = Empresa.objects.get(id=item_empresa)
 
                 productos_solicitados.append({
                     'id': producto.id,
                     'nro_pedido': nro_pedido,
+                    'item_empresa': item_empresa,
                     'item_pedido': item_pedido,
                     'nombre': producto.nombre,
                     'marca': producto.marca,
@@ -180,6 +198,7 @@ def crear_pedido(request):
                     item_pedido = (ultimo_pedido.item_pedido + 1) if ultimo_pedido else 1
 
                     Pedido.objects.create(
+                        item_empresa=item_empresa,
                         nro_pedido=producto_data['nro_pedido'],
                         cliente=cliente,
                         producto=producto,
@@ -288,25 +307,16 @@ def editar_producto(request, nro_pedido, item_pedido):
     return render(request, 'pedidos/editar_producto.html', {'producto': producto})
 
 @login_required
-def eliminar_producto(request, nro_pedido, item_pedido):
-    producto = Pedido.objects.get(nro_pedido=nro_pedido, item_pedido=item_pedido)
-    producto.delete()
-    return redirect('crear_pedido')
-
-@login_required
-def eliminar_productos(request):
+def eliminar_producto(request):
     if request.method == 'POST':
-        ids_para_eliminar = request.POST.getlist('suprimir')
-        Producto.objects.filter(id__in=ids_para_eliminar).delete()
+        productos_a_eliminar = request.POST.getlist('eliminar[]')
+        Producto.objects.filter(id__in=productos_a_eliminar).delete()
     return redirect('ver_productos')
 
 @login_required
-def eliminar_productos(request):
-    if request.method == "POST":
-        productos_a_eliminar = request.POST.getlist('suprimir[]')
-        if productos_a_eliminar:
-            Producto.objects.filter(id__in=productos_a_eliminar).delete()
-            messages.success(request, "Productos seleccionados eliminados correctamente.")
-        else:
-            messages.warning(request, "No seleccionaste ningún producto para eliminar.")
-    return redirect('crear_producto')
+def eliminar_empresas(request):
+    if request.method == 'POST':
+        empresas_a_eliminar = request.POST.getlist('empresas_a_eliminar')
+        Empresa.objects.filter(id__in=empresas_a_eliminar).delete()
+        messages.success(request, "Empresas seleccionadas eliminadas exitosamente.")
+    return redirect('ver_empresas')

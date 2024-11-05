@@ -31,44 +31,28 @@
         .company-item {
             padding: 10px;
             border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .company-item:last-child {
             border-bottom: none;
         }
 
-        .company-item strong {
-            font-weight: bold;
+        .delete-button {
+            background-color: #FF5733;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
         }
 
-        .actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        .actions a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .actions a:hover {
-            color: #0056b3;
-        }
-
-        .back-to-home {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-            color: #4CAF50;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .back-to-home:hover {
-            color: #45a049;
+        .delete-button:hover {
+            background-color: #E74C3C;
         }
     </style>
 </head>
@@ -78,18 +62,23 @@
 
     <h1>Empresas</h1>
 
-    <div class="company-list">
-        {% for empresa in empresas %}
-            <div class="company-item">
-                <strong>{{ empresa.nombre }}</strong> - {{ empresa.direccion }} - {{ empresa.telefono }}
-            </div>
-        {% empty %}
-            <div class="company-item">No hay empresas registradas.</div>
-        {% endfor %}
-    </div>
+    <form method="post" action="{% url 'eliminar_empresas' %}">
+        {% csrf_token %}
+        <div class="company-list">
+            {% for empresa in empresas %}
+                <div class="company-item">
+                    <span>
+                        <strong>{{ empresa.nombre }}</strong> - {{ empresa.direccion }} - {{ empresa.telefono }} - Item: {{ empresa.item_empresa }}
+                    </span>
+                    <input type="checkbox" name="empresas_a_eliminar" value="{{ empresa.id }}">
+                </div>
+            {% empty %}
+                <div class="company-item">No hay empresas registradas.</div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="delete-button">Eliminar Empresas Seleccionadas</button>
+    </form>
 
-    <div class="actions">
-        <a href="{% url 'crear_empresa' %}">Crear Empresa</a>
-    </div>
+    <a href="{% url 'crear_empresa' %}" class="back-to-home">🏢 Crear Empresa</a>
 </body>
 </html>

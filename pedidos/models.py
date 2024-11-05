@@ -11,6 +11,7 @@ class Portada(models.Model):
         return f"Portada {self.id}"
 
 class Empresa(models.Model):
+    item_empresa = models.CharField(max_length=10, unique=True)  # Nuevo campo con un máximo de 10 caracteres
     nombre = models.CharField(max_length=100)
     direccion = models.CharField(max_length=255, default="Dirección no especificada")
     telefono = models.CharField(max_length=15, default="Sin teléfono")
@@ -42,6 +43,7 @@ class Cliente(models.Model):
         return f"{self.nombre} {self.apellido}"
 
 class Producto(models.Model):
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, default=1)
     nombre = models.CharField(max_length=100)
     marca = models.CharField(max_length=50)
     descripcion = models.TextField()
@@ -49,7 +51,7 @@ class Producto(models.Model):
     valor_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_vencimiento = models.DateField()
     item_producto = models.IntegerField(unique=True, default=1)
-
+    
     def clean(self):
         # Verificar si `item_producto` ya existe
         if Producto.objects.filter(item_producto=self.item_producto).exclude(pk=self.pk).exists():
@@ -68,6 +70,7 @@ class Pedido(models.Model):
     item_pedido = models.IntegerField(default=1)  # Campo para el número de ítem
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    item_empresa = models.CharField(max_length=10, null=True, blank=True, default=1)
     EstatusPed = models.CharField(max_length=20, choices=[
         ('Solicitado', 'Solicitado'),
         ('Confirmado', 'Confirmado'),
