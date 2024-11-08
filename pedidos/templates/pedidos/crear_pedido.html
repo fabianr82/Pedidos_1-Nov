@@ -104,6 +104,7 @@
     <h1>Crear Pedido</h1>
     <form method="post">
         {% csrf_token %}
+        
         <label for="cliente">Cliente:</label>
         <select name="cliente" id="cliente" required>
             {% for cliente in clientes %}
@@ -115,6 +116,13 @@
         <select name="producto" id="producto" required>
             {% for producto in productos %}
                 <option value="{{ producto.id }}">{{ producto.nombre }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="item_empresa">Empresa:</label>
+        <select name="item_empresa" id="item_empresa" required>
+            {% for empresa in empresas %}
+                <option value="{{ empresa.item_empresa }}">{{ empresa.nombre }} - {{ empresa.item_empresa }}</option>
             {% endfor %}
         </select>
 
@@ -139,6 +147,7 @@
             <tr>
                 <th>Fecha del Pedido</th>
                 <th>Nro Pedido</th>
+                <th>Item Empresa</th>
                 <th>Item Producto</th>
                 <th>Nombre</th>
                 <th>Apellido</th>
@@ -153,6 +162,7 @@
             <tr>
                 <td>{{ producto.fecha_pedido }}</td>
                 <td>{{ producto.nro_pedido }}</td>
+                <td>{{ producto.item_empresa }}</td>
                 <td>{{ producto.item_producto }}</td>
                 <td>{{ cliente_seleccionado.nombre }}</td>
                 <td>{{ cliente_seleccionado.apellido }}</td>

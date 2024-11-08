@@ -99,10 +99,10 @@
             <label for="descripcion">Descripción:</label>
             <textarea name="descripcion" id="descripcion"></textarea>
 
-            <label for="item_empresa">Item Empresa:</label>
+            <label for="item_empresa">Empresa:</label>
             <select name="item_empresa" id="item_empresa" required>
                 {% for empresa in empresas %}
-                    <option value="{{ empresa.id }}">{{ empresa.nombre }} - {{ empresa.item_empresa }}</option>
+                    <option value="{{ empresa.id }}">{{ empresa.nombre }} - Item Empresa: {{ empresa.item_empresa }}</option>
                 {% endfor %}
             </select>
 

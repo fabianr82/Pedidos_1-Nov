@@ -71,17 +71,27 @@
     <div class="form-container">
         <form method="post">
             {% csrf_token %}
+
+            <label for="item_empresa">Item Empresa:</label>
+            <input type="text" name="item_empresa" id="item_empresa" required maxlength="10">
+
             <label for="nombre">Nombre:</label>
             <input type="text" name="nombre" id="nombre" required>
 
             <label for="direccion">Dirección:</label>
             <input type="text" name="direccion" id="direccion" required>
 
+            <label for="nit">NIT:</label>
+            <input type="text" name="nit" id="nit" required maxlength="10">
+
+            <label for="coord_emp">Coordenadas:</label>
+            <input type="text" name="coord_emp" id="coord_emp" placeholder="Latitud, Longitud" required>
+
+            <label for="ciudad_emp">Ciudad:</label>
+            <input type="text" name="ciudad_emp" id="ciudad_emp" required>
+
             <label for="telefono">Teléfono:</label>
             <input type="text" name="telefono" id="telefono" required>
-
-            <label for="item_empresa">Item Empresa:</label>
-            <input type="number" name="item_empresa" id="item_empresa" required maxlength="10">
 
             <button type="submit">Guardar Empresa</button>
         </form>

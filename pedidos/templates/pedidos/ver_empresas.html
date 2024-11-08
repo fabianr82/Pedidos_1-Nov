@@ -62,23 +62,22 @@
 
     <h1>Empresas</h1>
 
-    <form method="post" action="{% url 'eliminar_empresas' %}">
-        {% csrf_token %}
-        <div class="company-list">
-            {% for empresa in empresas %}
-                <div class="company-item">
-                    <span>
-                        <strong>{{ empresa.nombre }}</strong> - {{ empresa.direccion }} - {{ empresa.telefono }} - Item: {{ empresa.item_empresa }}
-                    </span>
-                    <input type="checkbox" name="empresas_a_eliminar" value="{{ empresa.id }}">
-                </div>
-            {% empty %}
-                <div class="company-item">No hay empresas registradas.</div>
-            {% endfor %}
-        </div>
-        <button type="submit" class="delete-button">Eliminar Empresas Seleccionadas</button>
-    </form>
+    <div class="company-list">
+        {% for empresa in empresas %}
+            <div class="company-item">
+                <strong>{{ empresa.nombre }}</strong><br>
+                Dirección: {{ empresa.direccion }}<br>
+                NIT: {{ empresa.nit }}<br>
+                Ciudad: {{ empresa.ciudad_emp }}<br>
+                Coordenadas: {{ empresa.coord_emp }}<br>
+                Teléfono: {{ empresa.telefono }}<br>
+                Item Empresa: {{ empresa.item_empresa }}
+            </div>
+        {% empty %}
+            <p>No hay empresas registradas.</p>
+        {% endfor %}
+    </div>
 
-    <a href="{% url 'crear_empresa' %}" class="back-to-home">🏢 Crear Empresa</a>
+    <a href="{% url 'crear_empresa' %}">Crear Empresa</a>
 </body>
 </html>
