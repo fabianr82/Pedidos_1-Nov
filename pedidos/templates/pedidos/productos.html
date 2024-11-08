@@ -2,15 +2,64 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <!-- <title>Ver Productos</title> -->
+    <title>Catálogo de Productos</title>
     {% load static %}
     <style>
+        /* Estilos generales para el cuerpo */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Estilo para el enlace de regreso */
+        .back-to-home {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-to-home:hover {
+            color: #45a049;
+        }
+
+        /* Contenedor para las imágenes del catálogo */
+        .catalog-container {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Estilo para las imágenes del producto */
         .producto {
             display: block;
             width: 100%; /* Asegura que las imágenes ocupen todo el ancho del contenedor */
             max-width: 600px; /* Ancho máximo para computadoras de escritorio */
-            margin: 20px auto; /* Centra las imágenes en la página */
             height: auto; /* Mantiene la proporción de las imágenes */
+            margin: 10px 0; /* Espacio entre las imágenes */
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         /* Ajuste para dispositivos móviles */
@@ -22,13 +71,18 @@
     </style>
 </head>
 <body>
-    <!-- <h1>Ver Productos</h1> -->
+    <!-- Enlace de regreso al inicio -->
+    <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
 
-    <!-- Mostrar las imágenes de manera vertical -->
-    <img src="{% static 'catalogo/1.png' %}" alt="Producto 1" class="producto">
-    <img src="{% static 'catalogo/2.png' %}" alt="Producto 2" class="producto">
-    <img src="{% static 'catalogo/3.png' %}" alt="Producto 3" class="producto">
-    <img src="{% static 'catalogo/4.png' %}" alt="Producto 4" class="producto">
+    <!-- Título del catálogo -->
+    <h1>Catálogo de Productos</h1>
 
+    <!-- Contenedor para las imágenes de productos -->
+    <div class="catalog-container">
+        <img src="{% static 'catalogo/1.png' %}" alt="Producto 1" class="producto">
+        <img src="{% static 'catalogo/2.png' %}" alt="Producto 2" class="producto">
+        <img src="{% static 'catalogo/3.png' %}" alt="Producto 3" class="producto">
+        <img src="{% static 'catalogo/4.png' %}" alt="Producto 4" class="producto">
+    </div>
 </body>
 </html>

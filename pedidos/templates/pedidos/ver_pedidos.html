@@ -90,6 +90,7 @@
             <th>Pedido ID</th>
             <th>Cliente</th>
             <th>Producto</th>
+            <th>Compañía</th>
             <th>Estatus del Pedido</th>
         </tr>
         {% for pedido in pedidos %}
@@ -97,6 +98,7 @@
             <td>{{ pedido.id }}</td>
             <td>{{ pedido.cliente.nombre }} {{ pedido.cliente.apellido }}</td>
             <td>{{ pedido.producto.nombre }}</td>
+            <td>{{ pedido.empresa.item_empresa }}</td>
             <td>{{ pedido.EstatusPed }}</td>
         </tr>
         {% empty %}

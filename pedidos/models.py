@@ -11,11 +11,14 @@ class Portada(models.Model):
         return f"Portada {self.id}"
 
 class Empresa(models.Model):
+    item_empresa = models.CharField(max_length=10, unique=True)  # Nuevo campo con un máximo de 10 caracteres
     nombre = models.CharField(max_length=100)
     direccion = models.CharField(max_length=255, default="Dirección no especificada")
+    nit = models.CharField(max_length=10, unique=True, default=1)
+    coord_emp = models.CharField(max_length=50, default="(lon_x.xxxx,lat_x.xxxx)")  # Para almacenar latitud y longitud
+    ciudad_emp = models.CharField(max_length=100, default="Ciudad")
     telefono = models.CharField(max_length=15, default="Sin teléfono")
-    # Agrega otros campos necesarios
-
+    
     def __str__(self):
         return self.nombre
 
@@ -42,6 +45,7 @@ class Cliente(models.Model):
         return f"{self.nombre} {self.apellido}"
 
 class Producto(models.Model):
+    item_empresa = models.ForeignKey(Empresa, to_field="item_empresa", on_delete=models.SET_NULL, null=True, blank=True)
     nombre = models.CharField(max_length=100)
     marca = models.CharField(max_length=50)
     descripcion = models.TextField()
@@ -49,7 +53,7 @@ class Producto(models.Model):
     valor_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_vencimiento = models.DateField()
     item_producto = models.IntegerField(unique=True, default=1)
-
+    
     def clean(self):
         # Verificar si `item_producto` ya existe
         if Producto.objects.filter(item_producto=self.item_producto).exclude(pk=self.pk).exists():
@@ -68,6 +72,8 @@ class Pedido(models.Model):
     item_pedido = models.IntegerField(default=1)  # Campo para el número de ítem
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    # Cambia `item_empresa` a un campo `ForeignKey` que apunte al modelo `Empresa`
+    item_empresa = models.ForeignKey(Empresa, to_field="item_empresa", on_delete=models.SET_NULL, null=True, blank=True)
     EstatusPed = models.CharField(max_length=20, choices=[
         ('Solicitado', 'Solicitado'),
         ('Confirmado', 'Confirmado'),
@@ -93,7 +99,6 @@ class Pedido(models.Model):
 
     def __str__(self):
         return f"Pedido {self.id} - Cliente: {self.cliente.nombre} {self.cliente.apellido} - Producto: {self.producto.nombre}"
-
     @property
     def val_producto(self):
         return self.producto.valor_unitario * self.cantidad
