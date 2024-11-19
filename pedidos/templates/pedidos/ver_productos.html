@@ -53,15 +53,34 @@
             max-width: 800px;
         }
 
+        .actions button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .actions button:hover {
+            background-color: #c0392b;
+        }
+
         .actions a {
-            color: #007bff;
             text-decoration: none;
             font-weight: bold;
-            margin: 5px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
         }
 
         .actions a:hover {
-            color: #0056b3;
+            background-color: #45a049;
+            color: white;
         }
 
         .back-to-home {
@@ -85,33 +104,39 @@
 
     <h1>Productos</h1>
 
-    <table>
-        <tr>
-            <th>Item Producto</th>
-            <th>Nombre</th>
-            <th>Marca</th>
-            <th>Descripción</th>
-            <th>Valor Unitario</th>
-            <th>Fecha de Vencimiento</th>
-        </tr>
-        {% for producto in productos %}
-        <tr>
-            <td>{{ producto.item_producto }}</td>
-            <td>{{ producto.nombre }}</td>
-            <td>{{ producto.marca }}</td>
-            <td>{{ producto.descripcion }}</td>
-            <td>${{ producto.valor_unitario }}</td>
-            <td>{{ producto.fecha_vencimiento|date:"d/m/Y" }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="6">No hay productos registrados.</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <form method="post" action="{% url 'eliminar_producto' %}">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <th>Seleccionar</th>
+                <th>Item Producto</th>
+                <th>Nombre</th>
+                <th>Marca</th>
+                <th>Descripción</th>
+                <th>Valor Unitario</th>
+                <th>Fecha de Vencimiento</th>
+            </tr>
+            {% for producto in productos %}
+            <tr>
+                <td><input type="checkbox" name="eliminar[]" value="{{ producto.id }}"></td>
+                <td>{{ producto.item_producto }}</td>
+                <td>{{ producto.nombre }}</td>
+                <td>{{ producto.marca }}</td>
+                <td>{{ producto.descripcion }}</td>
+                <td>${{ producto.valor_unitario }}</td>
+                <td>{{ producto.fecha_vencimiento|date:"d/m/Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7">No hay productos registrados.</td>
+            </tr>
+            {% endfor %}
+        </table>
 
-    <div class="actions">
-        <a href="{% url 'crear_producto' %}">Crear Producto</a>
-    </div>
+        <div class="actions">
+            <button type="submit">Eliminar Productos Seleccionados</button>
+            <a href="{% url 'crear_producto' %}">Crear Producto</a>
+        </div>
+    </form>
 </body>
 </html>
