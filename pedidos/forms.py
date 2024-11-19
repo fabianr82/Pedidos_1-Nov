@@ -15,6 +15,9 @@ class ClienteForm(forms.ModelForm):
     class Meta:
         model = Cliente
         fields = '__all__'
+        widgets = {
+            'item_empresa': forms.Select(attrs={'class': 'form-control'}),
+        }
 
 class ProductoForm(forms.ModelForm):
     class Meta:

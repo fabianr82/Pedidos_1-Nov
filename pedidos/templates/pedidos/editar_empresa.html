@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Crear Cliente</title>
+    <title>Editar Empresa</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -37,7 +37,9 @@
 
         form input[type="text"],
         form input[type="number"],
-        form select,
+        form input[type="tel"],
+        form input[type="email"],
+        form input[type="date"],
         form textarea {
             width: 100%;
             padding: 8px;
@@ -63,28 +65,34 @@
         form button:hover {
             background-color: #45a049;
         }
+
+        .back-to-home {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-to-home:hover {
+            color: #45a049;
+        }
     </style>
 </head>
 <body>
-    <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
+    <!-- Botón para volver a la lista de empresas -->
+    <a href="{% url 'ver_empresas' %}" class="back-to-home">🏠 Volver a Empresas</a>
 
-    <h1>Crear Cliente</h1>
-    
+    <h1>Editar Empresa</h1>
+
     <div class="form-container">
         <form method="post">
             {% csrf_token %}
-            <label for="item_empresa">Empresa:</label>
-            <select name="item_empresa" id="item_empresa" required>
-                {% for empresa in empresas %}
-                    <option value="{{ empresa.id }}">{{ empresa.nombre }} - {{ empresa.item_empresa }}</option>
-                {% endfor %}
-            </select>
-            
             {{ form.as_p }}
-            <button type="submit">Guardar Cliente</button>
+            <button type="submit">Guardar Cambios</button>
         </form>
     </div>
-
-    <a href="{% url 'ver_clientes' %}" class="back-to-home">👤 Ver Clientes</a>
 </body>
 </html>

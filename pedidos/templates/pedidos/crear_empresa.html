@@ -18,6 +18,20 @@
             color: #333;
         }
 
+        .back-to-home {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-to-home:hover {
+            color: #45a049;
+        }
+
         .form-container {
             background-color: #fff;
             border-radius: 8px;
@@ -53,7 +67,7 @@
             background-color: #4CAF50;
             color: white;
             border: none;
-            padding: 10px 15px;
+            padding: 14px 15px;
             font-size: 1rem;
             cursor: pointer;
             border-radius: 4px;
@@ -65,9 +79,37 @@
         form button:hover {
             background-color: #45a049;
         }
+
+        /* Estilo para el contenedor de Ciudad Empresa */
+        .ciudad-container {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Espacio entre los elementos */
+            margin-bottom: 20px; /* Espacio adicional entre el contenedor y el botón */
+        }
+
+        .ciudad-container input {
+            flex: 1; /* Permite que el input ocupe el espacio disponible */
+        }
+
+        .ciudad-container button {
+            background-color: #2196F3;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .ciudad-container button:hover {
+            background-color: #1976D2;
+        }
     </style>
 </head>
 <body>
+    <!-- Botón para volver al inicio -->
     <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
 
     <h1>Crear Empresa</h1>
@@ -75,10 +117,16 @@
     <div class="form-container">
         <form method="post">
             {% csrf_token %}
+
             <label for="item_empresa">ID Empresa:</label>
             <input type="text" name="item_empresa" id="item_empresa" value="ID Empresa"
                    onfocus="if (this.value === 'ID Empresa') this.value = '';" 
                    onblur="if (this.value === '') this.value = 'ID Empresa';" required>
+                   
+            <label for="nit">NIT:</label>
+            <input type="text" name="nit" id="nit" value="NIT Empresa"
+                   onfocus="if (this.value === 'NIT Empresa') this.value = '';" 
+                   onblur="if (this.value === '') this.value = 'NIT Empresa';" required>
 
             <label for="nombre">Nombre:</label>
             <input type="text" name="nombre" id="nombre" value="Nombre de la Empresa"
@@ -86,9 +134,9 @@
                    onblur="if (this.value === '') this.value = 'Nombre de la Empresa';" required>
 
             <label for="direccion">Dirección:</label>
-            <input type="text" name="direccion" id="direccion" value="Dirección no especificada"
-                   onfocus="if (this.value === 'Dirección no especificada') this.value = '';" 
-                   onblur="if (this.value === '') this.value = 'Dirección no especificada';" required>
+            <input type="text" name="direccion" id="direccion" value="Dirección Empresa"
+                   onfocus="if (this.value === 'Dirección Empresa') this.value = '';" 
+                   onblur="if (this.value === '') this.value = 'Dirección Empresa';" required>
 
             <label for="coord_emp">Coordenadas:</label>
             <input type="text" name="coord_emp" id="coord_emp" value="Formato: Latitud, Longitud"
@@ -96,19 +144,34 @@
                    onblur="if (this.value === '') this.value = 'Formato: Latitud, Longitud';" required>
 
             <label for="telefono">Teléfono:</label>
-            <input type="text" name="telefono" id="telefono" value="+57 Teléfono"
-                   onfocus="if (this.value === '+57 Teléfono') this.value = '';" 
-                   onblur="if (this.value === '') this.value = '+57 Teléfono';" required>
+            <input type="text" name="telefono" id="telefono" value="Número"
+                   onfocus="if (this.value === 'Número') this.value = '';" 
+                   onblur="if (this.value === '') this.value = 'Número';" required>
 
-            <label for="ciudad">Ciudad:</label>
-            <input type="text" name="ciudad" id="ciudad" value="Ciudad"
-                   onfocus="if (this.value === 'Ciudad') this.value = '';" 
-                   onblur="if (this.value === '') this.value = 'Ciudad';" required>
+            <label for="ciudad_emp">Ciudad Empresa:</label>
+            <div class="ciudad-container">
+                <input list="ciudades" name="ciudad_emp" id="ciudad_emp" placeholder="Escribe o selecciona una ciudad" required>
+                <datalist id="ciudades">
+                    <option value="BOGOTÁ D.C.">BOGOTÁ D.C.</option>
+                    <option value="MANTA">MANTA</option>
+                    <option value="TUNJA">TUNJA</option>
+                    <option value="BELÉN">BELÉN</option>
+                    <option value="MEDELLÍN">MEDELLÍN</option>
+                    <option value="CALI">CALI</option>
+                    <option value="BARRANQUILLA">BARRANQUILLA</option>
+                    <option value="CARTAGENA">CARTAGENA</option>
+                    <option value="BUCARAMANGA">BUCARAMANGA</option>
+                    <option value="MANIZALES">MANIZALES</option>
+                    <option value="PEREIRA">PEREIRA</option>
+                    <option value="IBAGUÉ">IBAGUÉ</option>
+                    <option value="SANTA MARTA">SANTA MARTA</option>
+                </datalist>
+            </div>
 
             <button type="submit">Guardar Empresa</button>
         </form>
     </div>
-
+    
     <a href="{% url 'ver_empresas' %}" class="back-to-home">🏢 Ver Empresas</a>
 </body>
 </html>

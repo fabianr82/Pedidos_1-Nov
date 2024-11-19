@@ -54,26 +54,40 @@ def logout_view(request):
 def crear_empresa(request):
     if request.method == 'POST':
         item_empresa = request.POST.get('item_empresa')
-        nombre = request.POST.get('nombre')
         nit = request.POST.get('nit')
+        nombre = request.POST.get('nombre')
         direccion = request.POST.get('direccion')
-        ciudad_emp = request.POST.get('ciudad_emp')
-        telefono = request.POST.get('telefono')
         coord_emp = request.POST.get('coord_emp')
+        telefono = request.POST.get('telefono')
+        ciudad_emp = request.POST.get('ciudad_emp')
 
         Empresa.objects.create(
             item_empresa=item_empresa,
-            nombre=nombre,
             nit=nit,
+            nombre=nombre,
             direccion=direccion,
-            ciudad_emp=ciudad_emp,
+            coord_emp=coord_emp,
             telefono=telefono,
-            coord_emp=coord_emp
+            ciudad_emp=ciudad_emp
         )
         messages.success(request, "Empresa creada exitosamente.")
         return redirect('ver_empresas')
 
     return render(request, 'pedidos/crear_empresa.html')
+
+@login_required
+def editar_empresa(request, id):
+    empresa = get_object_or_404(Empresa, id=id)
+    if request.method == 'POST':
+        form = EmpresaForm(request.POST, instance=empresa)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Empresa editada exitosamente.")
+            return redirect('ver_empresas')
+    else:
+        form = EmpresaForm(instance=empresa)
+
+    return render(request, 'pedidos/editar_empresa.html', {'form': form})
 
 @login_required
 def crear_user_sist(request):
@@ -92,10 +106,12 @@ def crear_cliente(request):
         form = ClienteForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('ver_clientes')
+            return redirect('ver_clientes')  # Redirige a la vista de clientes después de guardar
     else:
         form = ClienteForm()
-    return render(request, 'pedidos/crear_cliente.html', {'form': form})
+    
+    empresas = Empresa.objects.all()  # Obtener todas las empresas disponibles
+    return render(request, 'crear_cliente.html', {'form': form, 'empresas': empresas})
 
 @login_required
 def crear_producto(request):
@@ -330,3 +346,28 @@ def eliminar_empresas(request):
         Empresa.objects.filter(id__in=empresas_a_eliminar).delete()
         messages.success(request, "Empresas seleccionadas eliminadas exitosamente.")
     return redirect('ver_empresas')
+
+@login_required
+def gestionar_empresas(request):
+    if request.method == "POST":
+        for key, value in request.POST.items():
+            if key.startswith("action") and "eliminar" in value:
+                _, empresa_id = value.split("_")
+                empresa = get_object_or_404(Empresa, id=empresa_id)
+                empresa.delete()
+                messages.success(request, "Empresa eliminada correctamente.")
+    return redirect('ver_empresas')
+
+@login_required
+def editar_empresa(request, id):
+    empresa = get_object_or_404(Empresa, id=id)
+    if request.method == 'POST':
+        form = EmpresaForm(request.POST, instance=empresa)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Empresa editada exitosamente.")
+            return redirect('ver_empresas')
+    else:
+        form = EmpresaForm(instance=empresa)
+
+    return render(request, 'pedidos/editar_empresa.html', {'form': form})

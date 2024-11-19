@@ -11,7 +11,9 @@ urlpatterns = [
     # Rutas de Empresa
     path('crear_empresa/', views.crear_empresa, name='crear_empresa'),
     path('ver_empresas/', views.ver_empresas, name='ver_empresas'),
+    path('gestionar_empresas/', views.gestionar_empresas, name='gestionar_empresas'),
     path('eliminar_empresas/', views.eliminar_empresas, name='eliminar_empresas'),
+    path('editar_empresa/<int:id>/', views.editar_empresa, name='editar_empresa'),
 
     # Rutas de Usuario y Cliente
     path('crear_usuario/', views.crear_user_sist, name='crear_usuario'),

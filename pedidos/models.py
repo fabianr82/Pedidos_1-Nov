@@ -11,17 +11,37 @@ class Portada(models.Model):
         return f"Portada {self.id}"
 
 class Empresa(models.Model):
+    CIUDADES = [
+        ("BOGOTÁ D.C.", "BOGOTÁ D.C."),
+        ("MANTA", "MANTA"),
+        ("TUNJA", "TUNJA"),
+        ("BELÉN", "BELÉN"),
+        ("MEDELLÍN", "MEDELLÍN"),
+        ("CALI", "CALI"),
+        ("BARRANQUILLA", "BARRANQUILLA"),
+        ("CARTAGENA", "CARTAGENA"),
+        ("BUCARAMANGA", "BUCARAMANGA"),
+        ("MANIZALES", "MANIZALES"),
+        ("PEREIRA", "PEREIRA"),
+        ("IBAGUÉ", "IBAGUÉ"),
+        ("SANTA MARTA", "SANTA MARTA"),
+    ]
     item_empresa = models.CharField(max_length=10, unique=True, default="ID Empresa")
+    nit = models.CharField(max_length=15, unique=True, default="NIT Empresa")
     nombre = models.CharField(max_length=100)
-    direccion = models.CharField(max_length=255, default="Dirección no especificada")
+    direccion = models.CharField(max_length=255, default="Dirección empresa")
     coord_emp = models.CharField(max_length=30, default="Formato: Latitud, Longitud")
     telefono = models.CharField(max_length=15, default="+57 y Teléfono")
-    ciudad = models.CharField(max_length=30, default="Ciudad")
+    ciudad_emp = models.CharField(
+        max_length=30,
+        choices=CIUDADES,
+        default="BOGOTÁ D.C."  # Valor predeterminado
+    )
 
     # Agrega otros campos necesarios
 
     def __str__(self):
-        return self.nombre
+        return f"{self.nombre} ({self.nit})"
 
 class UserSistem(models.Model):
     # Define los campos para el modelo UserSistem
@@ -41,6 +61,11 @@ class Cliente(models.Model):
     whatsapp = models.CharField(max_length=20)
     zona = models.CharField(max_length=50)
     metodo_pago = models.CharField(max_length=50)
+    item_empresa = models.ForeignKey(
+        'Empresa',  # Referencia al modelo Empresa
+        on_delete=models.CASCADE,
+        default=1  # ID predeterminado de una Empresa existente
+    )
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
