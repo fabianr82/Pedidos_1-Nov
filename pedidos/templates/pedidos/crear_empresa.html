@@ -36,15 +36,11 @@
         }
 
         form input[type="text"],
-<<<<<<< HEAD
         form input[type="number"],
         form input[type="tel"],
         form input[type="email"],
         form input[type="date"],
         form textarea {
-=======
-        form input[type="number"] {
->>>>>>> d3ec3b4c88e179074629feb631a2aa50fa1d88e3
             width: 100%;
             padding: 8px;
             margin-bottom: 15px;
@@ -79,7 +75,6 @@
     <div class="form-container">
         <form method="post">
             {% csrf_token %}
-<<<<<<< HEAD
             <label for="item_empresa">ID Empresa:</label>
             <input type="text" name="item_empresa" id="item_empresa" value="ID Empresa"
                    onfocus="if (this.value === 'ID Empresa') this.value = '';" 
@@ -109,29 +104,6 @@
             <input type="text" name="ciudad" id="ciudad" value="Ciudad"
                    onfocus="if (this.value === 'Ciudad') this.value = '';" 
                    onblur="if (this.value === '') this.value = 'Ciudad';" required>
-=======
-
-            <label for="item_empresa">Item Empresa:</label>
-            <input type="text" name="item_empresa" id="item_empresa" required maxlength="10">
-
-            <label for="nombre">Nombre:</label>
-            <input type="text" name="nombre" id="nombre" required>
-
-            <label for="direccion">Dirección:</label>
-            <input type="text" name="direccion" id="direccion" required>
-
-            <label for="nit">NIT:</label>
-            <input type="text" name="nit" id="nit" required maxlength="10">
-
-            <label for="coord_emp">Coordenadas:</label>
-            <input type="text" name="coord_emp" id="coord_emp" placeholder="Latitud, Longitud" required>
-
-            <label for="ciudad_emp">Ciudad:</label>
-            <input type="text" name="ciudad_emp" id="ciudad_emp" required>
-
-            <label for="telefono">Teléfono:</label>
-            <input type="text" name="telefono" id="telefono" required>
->>>>>>> d3ec3b4c88e179074629feb631a2aa50fa1d88e3
 
             <button type="submit">Guardar Empresa</button>
         </form>

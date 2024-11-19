@@ -11,8 +11,7 @@ class Portada(models.Model):
         return f"Portada {self.id}"
 
 class Empresa(models.Model):
-<<<<<<< HEAD
-    item_empresa = models.CharField(max_length=10, default="ID Empresa")
+    item_empresa = models.CharField(max_length=10, unique=True, default="ID Empresa")
     nombre = models.CharField(max_length=100)
     direccion = models.CharField(max_length=255, default="Dirección no especificada")
     coord_emp = models.CharField(max_length=30, default="Formato: Latitud, Longitud")
@@ -21,16 +20,6 @@ class Empresa(models.Model):
 
     # Agrega otros campos necesarios
 
-=======
-    item_empresa = models.CharField(max_length=10, unique=True)  # Nuevo campo con un máximo de 10 caracteres
-    nombre = models.CharField(max_length=100)
-    direccion = models.CharField(max_length=255, default="Dirección no especificada")
-    nit = models.CharField(max_length=10, unique=True, default=1)
-    coord_emp = models.CharField(max_length=50, default="(lon_x.xxxx,lat_x.xxxx)")  # Para almacenar latitud y longitud
-    ciudad_emp = models.CharField(max_length=100, default="Ciudad")
-    telefono = models.CharField(max_length=15, default="Sin teléfono")
-    
->>>>>>> d3ec3b4c88e179074629feb631a2aa50fa1d88e3
     def __str__(self):
         return self.nombre
 
