@@ -11,9 +11,13 @@ class Portada(models.Model):
         return f"Portada {self.id}"
 
 class Empresa(models.Model):
+    item_empresa = models.CharField(max_length=10, default="ID Empresa")
     nombre = models.CharField(max_length=100)
     direccion = models.CharField(max_length=255, default="Dirección no especificada")
-    telefono = models.CharField(max_length=15, default="Sin teléfono")
+    coord_emp = models.CharField(max_length=30, default="Formato: Latitud, Longitud")
+    telefono = models.CharField(max_length=15, default="+57 y Teléfono")
+    ciudad = models.CharField(max_length=30, default="Ciudad")
+
     # Agrega otros campos necesarios
 
     def __str__(self):

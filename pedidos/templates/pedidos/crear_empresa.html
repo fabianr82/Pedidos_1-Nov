@@ -50,8 +50,9 @@
         }
 
         form input[type="text"],
-        form input[type="email"],
         form input[type="number"],
+        form input[type="tel"],
+        form input[type="email"],
         form input[type="date"],
         form textarea {
             width: 100%;
@@ -89,7 +90,36 @@
     <div class="form-container">
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
+            <label for="item_empresa">ID Empresa:</label>
+            <input type="text" name="item_empresa" id="item_empresa" value="ID Empresa"
+                   onfocus="if (this.value === 'ID Empresa') this.value = '';" 
+                   onblur="if (this.value === '') this.value = 'ID Empresa';" required>
+
+            <label for="nombre">Nombre:</label>
+            <input type="text" name="nombre" id="nombre" value="Nombre de la Empresa"
+                   onfocus="if (this.value === 'Nombre de la Empresa') this.value = '';" 
+                   onblur="if (this.value === '') this.value = 'Nombre de la Empresa';" required>
+
+            <label for="direccion">Dirección:</label>
+            <input type="text" name="direccion" id="direccion" value="Dirección no especificada"
+                   onfocus="if (this.value === 'Dirección no especificada') this.value = '';" 
+                   onblur="if (this.value === '') this.value = 'Dirección no especificada';" required>
+
+            <label for="coord_emp">Coordenadas:</label>
+            <input type="text" name="coord_emp" id="coord_emp" value="Formato: Latitud, Longitud"
+                   onfocus="if (this.value === 'Formato: Latitud, Longitud') this.value = '';" 
+                   onblur="if (this.value === '') this.value = 'Formato: Latitud, Longitud';" required>
+
+            <label for="telefono">Teléfono:</label>
+            <input type="text" name="telefono" id="telefono" value="+57 Teléfono"
+                   onfocus="if (this.value === '+57 Teléfono') this.value = '';" 
+                   onblur="if (this.value === '') this.value = '+57 Teléfono';" required>
+
+            <label for="ciudad">Ciudad:</label>
+            <input type="text" name="ciudad" id="ciudad" value="Ciudad"
+                   onfocus="if (this.value === 'Ciudad') this.value = '';" 
+                   onblur="if (this.value === '') this.value = 'Ciudad';" required>
+
             <button type="submit">Guardar Empresa</button>
         </form>
     </div>
