@@ -6,7 +6,7 @@ urlpatterns = [
     path('', views.login_view, name='login'),  # Página de inicio como login
     path('inicio/', views.inicio, name='inicio'),
     path('logout/', views.logout_view, name='logout'),
-    path('cargar_portada/', views.cargar_portada, name='cargar_portada'),
+    # path('cargar_portada/', views.cargar_portada, name='cargar_portada'),
 
     # Rutas de Empresa
     path('crear_empresa/', views.crear_empresa, name='crear_empresa'),
@@ -18,6 +18,7 @@ urlpatterns = [
     # Rutas de Usuario y Cliente
     path('crear_usuario/', views.crear_user_sist, name='crear_usuario'),
     path('ver_usuarios/', views.ver_usuarios, name='ver_usuarios'),
+    
     path('crear_cliente/', views.crear_cliente, name='crear_cliente'),
     path('ver_clientes/', views.ver_clientes, name='ver_clientes'),
 

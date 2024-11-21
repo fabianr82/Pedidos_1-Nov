@@ -106,12 +106,16 @@ def crear_cliente(request):
         form = ClienteForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "Cliente creado exitosamente.")
             return redirect('ver_clientes')  # Redirige a la vista de clientes después de guardar
+        else:
+            messages.error(request, "Hubo un error al crear el cliente.")
     else:
         form = ClienteForm()
-    
-    empresas = Empresa.objects.all()  # Obtener todas las empresas disponibles
-    return render(request, 'crear_cliente.html', {'form': form, 'empresas': empresas})
+
+    # Obtener todas las empresas disponibles
+    empresas = Empresa.objects.all()
+    return render(request, 'pedidos/crear_cliente.html', {'form': form, 'empresas': empresas})
 
 @login_required
 def crear_producto(request):
