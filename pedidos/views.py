@@ -253,6 +253,11 @@ def crear_pedido(request):
 
 # Vistas para listar entidades
 @login_required
+def ver_productos(request):
+    productos = Producto.objects.all()
+    return render(request, 'pedidos/ver_productos.html', {'productos': productos})
+
+@login_required
 def ver_empresas(request):
     empresas = Empresa.objects.all()
     return render(request, 'pedidos/ver_empresas.html', {'empresas': empresas})
@@ -266,11 +271,6 @@ def ver_usuarios(request):
 def ver_clientes(request):
     clientes = Cliente.objects.all()
     return render(request, 'pedidos/ver_clientes.html', {'clientes': clientes})
-
-@login_required
-def ver_productos(request):
-    productos = Producto.objects.all()
-    return render(request, 'pedidos/ver_productos.html', {'productos': productos})
 
 @login_required
 def ver_pedidos(request):
@@ -317,8 +317,7 @@ def ubicacion_clientes(request):
     }
     return render(request, 'pedidos/ubicacion_clientes.html', context)
 
-@login_required
-def productos(request):
+def productos(request):        # Acá se toman los productos del catálogo en imágenes
     return render(request, 'pedidos/productos.html')
 
 # Vistas para editar y eliminar productos en un pedido
