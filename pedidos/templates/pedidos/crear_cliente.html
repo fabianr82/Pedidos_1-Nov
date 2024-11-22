@@ -73,14 +73,18 @@
     <div class="form-container">
         <form method="post">
             {% csrf_token %}
-            <label for="item_empresa">Empresa:</label>
+            
+            <!-- Campo Empresa -->
+            <label for="item_empresa"><strong>Empresa:</strong></label>
             <select name="item_empresa" id="item_empresa" required>
                 {% for empresa in empresas %}
                     <option value="{{ empresa.id }}">{{ empresa.nombre }} - {{ empresa.item_empresa }}</option>
                 {% endfor %}
             </select>
             
+            <!-- Resto de los campos del formulario -->
             {{ form.as_p }}
+
             <button type="submit">Guardar Cliente</button>
         </form>
     </div>
