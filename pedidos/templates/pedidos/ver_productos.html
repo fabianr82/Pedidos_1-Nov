@@ -115,20 +115,24 @@
                 <th>Descripción</th>
                 <th>Valor Unitario</th>
                 <th>Fecha de Vencimiento</th>
+                <th>Acciones</th>
             </tr>
             {% for producto in productos %}
             <tr>
-                <td><input type="checkbox" name="eliminar[]" value="{{ producto.id }}"></td>
+                <td><input type="checkbox" name="eliminar[]" value="{{ producto.item_producto }}"></td>
                 <td>{{ producto.item_producto }}</td>
                 <td>{{ producto.nombre }}</td>
                 <td>{{ producto.marca }}</td>
                 <td>{{ producto.descripcion }}</td>
                 <td>${{ producto.valor_unitario }}</td>
                 <td>{{ producto.fecha_vencimiento|date:"d/m/Y" }}</td>
+                <td>
+                    <a href="{% url 'editar_producto' producto.item_producto %}" class="btn-edit">Editar</a>
+                </td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="7">No hay productos registrados.</td>
+                <td colspan="8">No hay productos registrados.</td>
             </tr>
             {% endfor %}
         </table>

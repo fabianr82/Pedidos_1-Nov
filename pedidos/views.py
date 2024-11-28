@@ -76,8 +76,9 @@ def crear_empresa(request):
     return render(request, 'pedidos/crear_empresa.html')
 
 @login_required
-def editar_empresa(request, id):
-    empresa = get_object_or_404(Empresa, id=id)
+def editar_empresa(request, item_empresa):
+    # Cambia el argumento 'id' por 'item_empresa'
+    empresa = get_object_or_404(Empresa, item_empresa=item_empresa)
     if request.method == 'POST':
         form = EmpresaForm(request.POST, instance=empresa)
         if form.is_valid():
@@ -127,28 +128,26 @@ def crear_producto(request):
         fecha_vencimiento = request.POST.get('fecha_vencimiento')
         item_producto = request.POST.get('item_producto')
         UM = request.POST.get('UM')
-        empresa_id = request.POST.get('item_empresa')  # Captura el ID de la empresa seleccionada
+        empresa_item = request.POST.get('item_empresa')
 
-        empresa = get_object_or_404(Empresa, id=empresa_id)  # Obtener la empresa basada en el ID
+        empresa = get_object_or_404(Empresa, item_empresa=empresa_item)
 
-        # Crear el producto con la empresa asociada
         Producto.objects.create(
-            empresa=empresa,
             nombre=nombre,
             marca=marca,
             descripcion=descripcion,
             valor_unitario=valor_unitario,
             fecha_vencimiento=fecha_vencimiento,
             item_producto=item_producto,
-            UM=UM
+            UM=UM,
+            empresa=empresa
         )
         
-        return render(request, 'pedidos/crear_producto.html')
+        messages.success(request, "Producto creado exitosamente.")
+        return redirect('ver_productos')
 
-    productos = Producto.objects.all()
     empresas = Empresa.objects.all()
     return render(request, 'pedidos/crear_producto.html', {
-        'productos': productos,
         'empresas': empresas
     })
 
@@ -176,7 +175,7 @@ def crear_pedido(request):
             total_pedido = sum(producto['val_producto'] for producto in productos_solicitados)
 
         elif 'agregar_producto' in request.POST:
-            item_empresa_id = request.POST.get('item_empresa')  # Cambié el nombre de la variable para mayor claridad
+            item_empresa = request.POST.get('item_empresa')  # Cambié el nombre de la variable para mayor claridad
             producto_id = request.POST.get('producto')
             cantidad = int(request.POST.get('cantidad', 1))
             estatus_pedido = request.POST.get('EstatusPed')
@@ -185,7 +184,7 @@ def crear_pedido(request):
                 producto = get_object_or_404(Producto, id=producto_id)
                 
                 # Obtener la instancia de Empresa en lugar de usar solo el ID
-                empresa = get_object_or_404(Empresa, id=item_empresa_id)
+                #empresa = get_object_or_404(Empresa, id=item_empresa_id)
 
                 val_producto = float(producto.valor_unitario) * cantidad
                 nro_pedido = request.session.get('nro_pedido', 1)
@@ -326,27 +325,44 @@ def productos(request):        # Acá se toman los productos del catálogo en im
 
 # Vistas para editar y eliminar productos en un pedido
 @login_required
-def editar_producto(request, nro_pedido, item_pedido):
-    producto = Pedido.objects.get(nro_pedido=nro_pedido, item_pedido=item_pedido)
+@login_required
+def editar_producto(request, item_producto):
+    producto = get_object_or_404(Producto, item_producto=item_producto)
+    empresas = Empresa.objects.all()
     if request.method == 'POST':
-        producto.cantidad = request.POST.get('cantidad')
-        producto.save()
-        return redirect('crear_pedido')
+        producto.nombre = request.POST.get('nombre')
+        producto.marca = request.POST.get('marca')
+        producto.descripcion = request.POST.get('descripcion')
+        producto.valor_unitario = request.POST.get('valor_unitario')
+        producto.fecha_vencimiento = request.POST.get('fecha_vencimiento')
+        producto.UM = request.POST.get('UM')
+        empresa_item = request.POST.get('item_empresa')
 
-    return render(request, 'pedidos/editar_producto.html', {'producto': producto})
+        empresa = get_object_or_404(Empresa, item_empresa=empresa_item)
+        producto.empresa = empresa
+
+        producto.save()
+        messages.success(request, "Producto actualizado correctamente.")
+        return redirect('ver_productos')
+
+    return render(request, 'pedidos/editar_producto.html', {
+        'producto': producto,
+        'empresas': empresas
+    })
 
 @login_required
 def eliminar_producto(request):
     if request.method == 'POST':
         productos_a_eliminar = request.POST.getlist('eliminar[]')
-        Producto.objects.filter(id__in=productos_a_eliminar).delete()
+        Producto.objects.filter(item_producto__in=productos_a_eliminar).delete()
+        messages.success(request, "Productos eliminados correctamente.")
     return redirect('ver_productos')
 
 @login_required
 def eliminar_empresas(request):
     if request.method == 'POST':
         empresas_a_eliminar = request.POST.getlist('empresas_a_eliminar')
-        Empresa.objects.filter(id__in=empresas_a_eliminar).delete()
+        Empresa.objects.filter(item_empresa__in=empresas_a_eliminar).delete()
         messages.success(request, "Empresas seleccionadas eliminadas exitosamente.")
     return redirect('ver_empresas')
 
@@ -355,22 +371,43 @@ def gestionar_empresas(request):
     if request.method == "POST":
         for key, value in request.POST.items():
             if key.startswith("action") and "eliminar" in value:
-                _, empresa_id = value.split("_")
-                empresa = get_object_or_404(Empresa, id=empresa_id)
+                _, empresa_item = value.split("_")
+                empresa = get_object_or_404(Empresa, item_empresa=empresa_item)
                 empresa.delete()
                 messages.success(request, "Empresa eliminada correctamente.")
     return redirect('ver_empresas')
 
 @login_required
-def editar_empresa(request, id):
-    empresa = get_object_or_404(Empresa, id=id)
+def editar_cliente(request, cliente_id):
+    cliente = get_object_or_404(Cliente, cliente_id=cliente_id)
     if request.method == 'POST':
-        form = EmpresaForm(request.POST, instance=empresa)
+        form = ClienteForm(request.POST, instance=cliente)
         if form.is_valid():
             form.save()
-            messages.success(request, "Empresa editada exitosamente.")
-            return redirect('ver_empresas')
+            messages.success(request, "Cliente actualizado correctamente.")
+            return redirect('ver_clientes')
     else:
-        form = EmpresaForm(instance=empresa)
+        form = ClienteForm(instance=cliente)
+    return render(request, 'pedidos/editar_cliente.html', {'form': form, 'cliente': cliente})
 
-    return render(request, 'pedidos/editar_empresa.html', {'form': form})
+
+@login_required
+def eliminar_cliente(request, cliente_id):  # Cambiado 'id' por 'cliente_id'
+    cliente = get_object_or_404(Cliente, cliente_id=cliente_id)
+    
+    # Antes de eliminar, eliminar o desasociar todos los pedidos relacionados
+    pedidos_relacionados = Pedido.objects.filter(cliente=cliente)
+    if pedidos_relacionados.exists():
+        pedidos_relacionados.delete()  # Elimina todos los pedidos relacionados con el cliente
+
+    cliente.delete()  # Luego elimina el cliente
+    messages.success(request, "Cliente eliminado correctamente.")
+    return redirect('ver_clientes')
+
+# Nueva vista para limpiar todos los clientes
+@login_required
+def limpiar_clientes(request):
+    if request.method == 'POST':
+        Cliente.objects.all().delete()  # Elimina todos los clientes de la base de datos
+        messages.success(request, "Lista de clientes limpiada exitosamente.")
+    return redirect('ver_clientes')

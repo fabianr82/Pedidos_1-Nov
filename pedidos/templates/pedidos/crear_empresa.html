@@ -50,10 +50,7 @@
         }
 
         form input[type="text"],
-        form input[type="number"],
         form input[type="tel"],
-        form input[type="email"],
-        form input[type="date"],
         form textarea {
             width: 100%;
             padding: 8px;
@@ -80,31 +77,8 @@
             background-color: #45a049;
         }
 
-        /* Estilo para el contenedor de Ciudad Empresa */
         .ciudad-container {
-            display: flex;
-            align-items: center;
-            gap: 10px; /* Espacio entre los elementos */
-            margin-bottom: 20px; /* Espacio adicional entre el contenedor y el botón */
-        }
-
-        .ciudad-container input {
-            flex: 1; /* Permite que el input ocupe el espacio disponible */
-        }
-
-        .ciudad-container button {
-            background-color: #2196F3;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
-        }
-
-        .ciudad-container button:hover {
-            background-color: #1976D2;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -119,34 +93,22 @@
             {% csrf_token %}
 
             <label for="item_empresa">ID Empresa:</label>
-            <input type="text" name="item_empresa" id="item_empresa" value="ID Empresa"
-                   onfocus="if (this.value === 'ID Empresa') this.value = '';" 
-                   onblur="if (this.value === '') this.value = 'ID Empresa';" required>
+            <input type="text" name="item_empresa" id="item_empresa" placeholder="ID Empresa" required>
                    
             <label for="nit">NIT:</label>
-            <input type="text" name="nit" id="nit" value="NIT Empresa"
-                   onfocus="if (this.value === 'NIT Empresa') this.value = '';" 
-                   onblur="if (this.value === '') this.value = 'NIT Empresa';" required>
+            <input type="text" name="nit" id="nit" placeholder="NIT Empresa" required>
 
             <label for="nombre">Nombre:</label>
-            <input type="text" name="nombre" id="nombre" value="Nombre de la Empresa"
-                   onfocus="if (this.value === 'Nombre de la Empresa') this.value = '';" 
-                   onblur="if (this.value === '') this.value = 'Nombre de la Empresa';" required>
+            <input type="text" name="nombre" id="nombre" placeholder="Nombre de la Empresa" required>
 
             <label for="direccion">Dirección:</label>
-            <input type="text" name="direccion" id="direccion" value="Dirección Empresa"
-                   onfocus="if (this.value === 'Dirección Empresa') this.value = '';" 
-                   onblur="if (this.value === '') this.value = 'Dirección Empresa';" required>
+            <input type="text" name="direccion" id="direccion" placeholder="Dirección Empresa" required>
 
             <label for="coord_emp">Coordenadas:</label>
-            <input type="text" name="coord_emp" id="coord_emp" value="Formato: Latitud, Longitud"
-                   onfocus="if (this.value === 'Formato: Latitud, Longitud') this.value = '';" 
-                   onblur="if (this.value === '') this.value = 'Formato: Latitud, Longitud';" required>
+            <input type="text" name="coord_emp" id="coord_emp" placeholder="Formato: Latitud, Longitud" required>
 
             <label for="telefono">Teléfono:</label>
-            <input type="text" name="telefono" id="telefono" value="Número"
-                   onfocus="if (this.value === 'Número') this.value = '';" 
-                   onblur="if (this.value === '') this.value = 'Número';" required>
+            <input type="tel" name="telefono" id="telefono" placeholder="Número de Teléfono" required>
 
             <label for="ciudad_emp">Ciudad Empresa:</label>
             <div class="ciudad-container">

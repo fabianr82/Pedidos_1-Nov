@@ -13,7 +13,9 @@ urlpatterns = [
     path('ver_empresas/', views.ver_empresas, name='ver_empresas'),
     path('gestionar_empresas/', views.gestionar_empresas, name='gestionar_empresas'),
     path('eliminar_empresas/', views.eliminar_empresas, name='eliminar_empresas'),
-    path('editar_empresa/<int:id>/', views.editar_empresa, name='editar_empresa'),
+    #path('editar_empresa/<int:id>/', views.editar_empresa, name='editar_empresa'),
+    path('editar_empresa/<str:item_empresa>/', views.editar_empresa, name='editar_empresa'),
+
 
     # Rutas de Usuario y Cliente
     path('crear_usuario/', views.crear_user_sist, name='crear_usuario'),
@@ -21,9 +23,13 @@ urlpatterns = [
     
     path('crear_cliente/', views.crear_cliente, name='crear_cliente'),
     path('ver_clientes/', views.ver_clientes, name='ver_clientes'),
-
+    path('editar_cliente/<str:cliente_id>/', views.editar_cliente, name='editar_cliente'),
+    path('eliminar_cliente/<str:cliente_id>/', views.eliminar_cliente, name='eliminar_cliente'),
+    path('limpiar_clientes/', views.limpiar_clientes, name='limpiar_clientes'),  # Añadir esta línea
+    
     # Rutas de Producto
     path('crear_producto/', views.crear_producto, name='crear_producto'),
+    path('editar_producto/<str:item_producto>/', views.editar_producto, name='editar_producto'),
     path('ver_productos/', views.ver_productos, name='ver_productos'),
     path('eliminar_producto/', views.eliminar_producto, name='eliminar_producto'),
 

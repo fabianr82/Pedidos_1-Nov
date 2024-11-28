@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Crear Cliente</title>
+    <title>Editar Cliente</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -66,21 +66,23 @@
     </style>
 </head>
 <body>
+    <!-- Botón para volver al inicio -->
     <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
 
-    <h1>Crear Cliente</h1>
+    <h1>Editar Cliente</h1>
     
     <div class="form-container">
         <form method="post">
             {% csrf_token %}
             
-            <!-- Resto de los campos del formulario -->
+            <!-- Mostrar el formulario para editar los datos del cliente -->
             {{ form.as_p }}
 
-            <button type="submit">Guardar Cliente</button>
+            <button type="submit">Guardar Cambios</button>
         </form>
     </div>
 
+    <!-- Botón para volver a la lista de clientes -->
     <a href="{% url 'ver_clientes' %}">👤 Ver Clientes</a>
 </body>
 </html>

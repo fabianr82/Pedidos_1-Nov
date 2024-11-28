@@ -101,7 +101,7 @@
         {% for empresa in empresas %}
         <div class="empresa-item">
             <!-- Checkbox para seleccionar la empresa -->
-            <input type="checkbox" name="selected_empresas" value="{{ empresa.id }}">
+            <input type="checkbox" name="selected_empresas" value="{{ empresa.item_empresa }}">
             
             <!-- Información de la empresa -->
             <div class="empresa-info">
@@ -117,14 +117,14 @@
             <!-- Botones de acciones separados -->
             <div class="empresa-actions">
                 <!-- Formulario para editar -->
-                <form method="get" action="{% url 'editar_empresa' empresa.id %}">
+                <form method="get" action="{% url 'editar_empresa' empresa.item_empresa %}">
                     <button type="submit" class="btn-edit">Editar</button>
                 </form>
 
                 <!-- Formulario para eliminar -->
                 <form method="post" action="{% url 'gestionar_empresas' %}">
                     {% csrf_token %}
-                    <input type="hidden" name="action" value="eliminar_{{ empresa.id }}">
+                    <input type="hidden" name="action" value="eliminar_{{ empresa.item_empresa }}">
                     <button type="submit" class="btn-delete">Eliminar</button>
                 </form>
             </div>

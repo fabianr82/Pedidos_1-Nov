@@ -2,9 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Crear Producto</title>
+    <title>Editar Producto</title>
     <style>
-        /* Estilos generales del cuerpo */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
@@ -68,44 +67,45 @@
     </style>
 </head>
 <body>
-    <!-- Enlace para volver al inicio -->
     <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
 
-    <h1>Crear Producto</h1>
+    <h1>Editar Producto</h1>
     
     <div class="form-container">
         <form method="post">
             {% csrf_token %}
 
             <label for="nombre">Nombre:</label>
-            <input type="text" name="nombre" id="nombre" required>
+            <input type="text" name="nombre" id="nombre" value="{{ producto.nombre }}" required>
 
             <label for="marca">Marca:</label>
-            <input type="text" name="marca" id="marca" required>
+            <input type="text" name="marca" id="marca" value="{{ producto.marca }}" required>
 
             <label for="descripcion">Descripción:</label>
-            <textarea name="descripcion" id="descripcion"></textarea>
+            <textarea name="descripcion" id="descripcion">{{ producto.descripcion }}</textarea>
 
             <label for="item_empresa">Empresa:</label>
             <select name="item_empresa" id="item_empresa" required>
                 {% for empresa in empresas %}
-                    <option value="{{ empresa.item_empresa }}">{{ empresa.nombre }} - Item Empresa: {{ empresa.item_empresa }}</option>
+                    <option value="{{ empresa.item_empresa }}" {% if producto.empresa.item_empresa == empresa.item_empresa %}selected{% endif %}>
+                        {{ empresa.nombre }} - Item Empresa: {{ empresa.item_empresa }}
+                    </option>
                 {% endfor %}
             </select>
 
             <label for="valor_unitario">Valor unitario:</label>
-            <input type="number" name="valor_unitario" id="valor_unitario" required>
+            <input type="number" name="valor_unitario" id="valor_unitario" value="{{ producto.valor_unitario }}" required>
 
             <label for="fecha_vencimiento">Fecha de Vencimiento:</label>
-            <input type="date" name="fecha_vencimiento" id="fecha_vencimiento" required>
+            <input type="date" name="fecha_vencimiento" id="fecha_vencimiento" value="{{ producto.fecha_vencimiento }}" required>
 
             <label for="item_producto">Item Producto:</label>
-            <input type="text" name="item_producto" id="item_producto" required>
+            <input type="text" name="item_producto" id="item_producto" value="{{ producto.item_producto }}" readonly>
 
             <label for="UM">Unidad de Medida (UM):</label>
-            <input type="text" name="UM" id="UM" maxlength="15" required>
+            <input type="text" name="UM" id="UM" value="{{ producto.UM }}" maxlength="15" required>
 
-            <button type="submit">Guardar Producto</button>
+            <button type="submit">Actualizar Producto</button>
         </form>
     </div>
 

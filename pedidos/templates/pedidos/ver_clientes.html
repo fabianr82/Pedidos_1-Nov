@@ -19,77 +19,138 @@
             margin-bottom: 20px;
         }
 
-        .client-list {
-            width: 100%;
-            max-width: 600px;
+        .table-container {
             background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
             padding: 20px;
+            width: 100%;
+            max-width: 1000px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
 
-        .client-item {
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        th, td {
+            text-align: left;
             padding: 10px;
-            border-bottom: 1px solid #ddd;
+            border: 1px solid #ddd;
         }
 
-        .client-item:last-child {
-            border-bottom: none;
-        }
-
-        .client-item strong {
+        th {
+            background-color: #f4f4f9;
             font-weight: bold;
         }
 
-        .actions {
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .button-container {
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
+            gap: 10px;
         }
 
-        .actions a {
-            color: #007bff;
-            text-decoration: none;
-            font-weight: bold;
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
         }
 
-        .actions a:hover {
-            color: #0056b3;
+        button:hover {
+            background-color: #45a049;
         }
 
-        .back-to-home {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-            color: #4CAF50;
-            text-decoration: none;
-            font-weight: bold;
+        .btn-delete {
+            background-color: #FF5733;
         }
 
-        .back-to-home:hover {
-            color: #45a049;
+        .btn-delete:hover {
+            background-color: #E74C3C;
+        }
+
+        .btn-clear {
+            background-color: #2196F3;
+        }
+
+        .btn-clear:hover {
+            background-color: #1976D2;
         }
     </style>
 </head>
 <body>
-    <!-- Icono para regresar al inicio -->
+    <h1>Clientes Registrados</h1>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Cliente</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Documento</th>
+                    <th>Dirección</th>
+                    <th>Coordenadas</th>
+                    <th>Teléfono</th>
+                    <th>WhatsApp</th>
+                    <th>Zona</th>
+                    <th>Método de Pago</th>
+                    <th>Empresa</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in clientes %}
+                <tr>
+                    <td>{{ cliente.cliente_id }}</td>
+                    <td>{{ cliente.nombre }}</td>
+                    <td>{{ cliente.apellido }}</td>
+                    <td>{{ cliente.documento }}</td>
+                    <td>{{ cliente.direccion }}</td>
+                    <td>{{ cliente.coordenadas }}</td>
+                    <td>{{ cliente.telefono }}</td>
+                    <td>{{ cliente.whatsapp }}</td>
+                    <td>{{ cliente.zona }}</td>
+                    <td>{{ cliente.metodo_pago }}</td>
+                    <td>{{ cliente.item_empresa.nombre }}</td>
+                    <td>
+                        <form method="get" action="{% url 'editar_cliente' cliente.cliente_id %}" style="display: inline;">
+                            <button type="submit">Editar</button>
+                        </form>
+                        <form method="post" action="{% url 'eliminar_cliente' cliente.cliente_id %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-delete">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="button-container">
+            <!-- Botón para limpiar la lista de clientes -->
+            <form method="post" action="{% url 'limpiar_clientes' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn-clear">Limpiar Lista de Clientes</button>
+            </form>
+
+            <!-- Botón para crear un nuevo cliente -->
+            <form method="get" action="{% url 'crear_cliente' %}">
+                <button type="submit">Crear Cliente</button>
+            </form>
+        </div>
+    </div>
+
     <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
-
-    <h1>Clientes</h1>
-
-    <div class="client-list">
-        {% for cliente in clientes %}
-            <div class="client-item">
-                <strong>{{ cliente.nombre }} {{ cliente.apellido }}</strong> - {{ cliente.telefono }}
-            </div>
-        {% empty %}
-            <div class="client-item">No hay clientes registrados.</div>
-        {% endfor %}
-    </div>
-
-    <div class="actions">
-        <a href="{% url 'crear_cliente' %}">Crear Cliente</a>
-    </div>
 </body>
 </html>
