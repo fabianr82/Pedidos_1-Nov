@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Crear Producto</title>
     <style>
-        /* Estilos generales del cuerpo */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
@@ -17,6 +16,20 @@
 
         h1 {
             color: #333;
+        }
+
+        .back-to-home {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-to-home:hover {
+            color: #45a049;
         }
 
         .form-container {
@@ -68,7 +81,7 @@
     </style>
 </head>
 <body>
-    <!-- Enlace para volver al inicio -->
+    <!-- Icono para regresar al inicio -->
     <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
 
     <h1>Crear Producto</h1>
@@ -88,13 +101,14 @@
 
             <label for="item_empresa">Empresa:</label>
             <select name="item_empresa" id="item_empresa" required>
+                <option value="" disabled selected>Selecciona una empresa</option>
                 {% for empresa in empresas %}
                     <option value="{{ empresa.item_empresa }}">{{ empresa.nombre }} - Item Empresa: {{ empresa.item_empresa }}</option>
                 {% endfor %}
             </select>
 
             <label for="valor_unitario">Valor unitario:</label>
-            <input type="number" name="valor_unitario" id="valor_unitario" required>
+            <input type="number" name="valor_unitario" id="valor_unitario" step="0.01" required>
 
             <label for="fecha_vencimiento">Fecha de Vencimiento:</label>
             <input type="date" name="fecha_vencimiento" id="fecha_vencimiento" required>
