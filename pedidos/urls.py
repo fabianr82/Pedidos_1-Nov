@@ -30,6 +30,7 @@ urlpatterns = [
     path('crear_pedido/', views.crear_pedido, name='crear_pedido'),
     path('ver_pedidos/', views.ver_pedidos, name='ver_pedidos'),
     path('detalle_pedido/<int:nro_pedido>/', views.detalles_pedido, name='detalle_pedido'),
+    path('ver_pedidos/pdf/<int:nro_pedido>/', views.generar_pdf, name='generar_pdf'),
     
     # Rutas de Mensajes y Ubicación
     path('enviar_mensajes/', views.enviar_mensajes, name='enviar_mensajes'),

@@ -108,7 +108,7 @@ class Pedido(models.Model):
     
     EstatusPed = models.CharField(max_length=20, choices=[
         ('Solicitado', 'Solicitado'),
-        ('Confirmado', 'Confirmado'),
+        ('Pagado', 'Pagado'),
         ('Entregado', 'Entregado')
     ])
     

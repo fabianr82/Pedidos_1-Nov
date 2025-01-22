@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -10,6 +11,7 @@ import json
 from datetime import datetime
 from django.utils import timezone
 from django.db import transaction
+from xhtml2pdf import pisa
 
 
 # Vista para la página de inicio
@@ -243,7 +245,7 @@ def ver_pedidos(request):
         'pedidos': pedidos,
     }
     return render(request, 'pedidos/ver_pedidos.html', context)
-    #return render(request, 'pedidos/ver_pedidos.html', {'pedidos': pedidos})
+   
 
 # Vista para enviar mensajes
 @login_required
@@ -339,3 +341,31 @@ def editar_empresa(request, id):
         form = EmpresaForm(instance=empresa)
 
     return render(request, 'pedidos/editar_empresa.html', {'form': form})
+
+
+def generar_pdf(request, nro_pedido):
+    # Obtener el pedido que deseas generar en PDF
+    pedido = get_object_or_404(Pedido, nro_pedido=nro_pedido)
+    detalles = pedido.detalles.all()
+
+    # Crear el contexto para el template
+    context = {
+        'pedido': pedido,
+        'detalles': detalles,
+    }
+
+    # Renderizar el template HTML a una cadena
+    html_content = render(request, 'pedidos/detalle_pedido.html', context).content
+
+    # Crear la respuesta HTTP para el archivo PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="pedido_{pedido.nro_pedido}.pdf"'
+
+    # Usar xhtml2pdf para convertir el HTML a PDF
+    pisa_status = pisa.CreatePDF(html_content, dest=response)
+
+    # Si hubo algún error al generar el PDF
+    if pisa_status.err:
+        return HttpResponse("Error al generar el PDF", status=500)
+
+    return response
