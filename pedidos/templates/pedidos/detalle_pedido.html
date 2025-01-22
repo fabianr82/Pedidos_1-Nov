@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalles del Pedido</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .back-to-home {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-to-home:hover {
+            color: #45a049;
+        }
+
+        table {
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        table th, table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        h3 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <a href="{% url 'ver_pedidos' %}" class="back-to-home">🏠 Volver a la lista de pedidos</a>
+
+    <h1>Detalles del Pedido {{ pedido.nro_pedido }}</h1>
+    <p>Cliente: {{ pedido.cliente.nombre }}</p>
+    <p>Fecha: {{ pedido.fecha_pedido }}</p>
+    <p>Estatus: {{ pedido.estatus }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="estatus">Actualizar Estatus:</label>
+        <select name="EstatusPed" required>
+            <option value="Solicitado" {% if pedido.EstatusPed == 'Solicitado' %}selected{% endif %}>Solicitado</option>
+            <option value="Confirmado" {% if pedido.EstatusPed == 'Confirmado' %}selected{% endif %}>Confirmado</option>
+            <option value="Entregado" {% if pedido.EstatusPed == 'Entregado' %}selected{% endif %}>Entregado</option>
+        </select>
+        <button type="submit">Actualizar Estatus</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detalle in detalles %}
+            <tr>
+                <td>{{ detalle.producto.nombre }}</td>
+                <td>{{ detalle.cantidad }}</td>
+                <td>{{ detalle.precio_unitario }}</td>
+                <td>{{ detalle.subtotal }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Total del Pedido: {{ pedido.total }}</h3>
+
+    <a href="{% url 'ver_pedidos' %}" class="back-to-home">📦 Ver todos los pedidos</a>
+</body>
+</html>

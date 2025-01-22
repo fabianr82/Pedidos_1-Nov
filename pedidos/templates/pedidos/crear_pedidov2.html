@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Pedido</title>
+    <style>
+        /* Estilos generales del cuerpo color del fondo principal */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Estilo para el botón de regreso a inicio y color boton */
+        .back-to-home {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        /* Efecto mover para el botón de regreso a inicio */
+        .back-to-home:hover {
+            color: #45a049;
+        }
+
+        /* Estilos de títulos principales */
+        h1, h2, h3 {
+            color: #333;
+        }
+
+        /* Estilos de los 3 formularios principales */
+        form {
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 30px;
+            width: 100%;
+            max-width: 1000px;  /* Maneja el ancho de los 3 contenedores*/
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        /* Estilos de etiquetas dentro del formulario */
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Estilos de campos de entrada y selección en el formulario */
+        form input[type="text"],
+        form input[type="number"],
+        form select {
+            width: 95%; /* Hace que los campos ocupen el 100% del ancho del contenedor padre (el formulario) */
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        /* Contenedor centrado para la tabla */
+        .centered-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+      
+        /* Estilos de la tabla de productos solicitados */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        /* Estilos de las celdas y encabezados de la tabla */
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        /* Estilo de fondo y color del texto de los encabezados de la tabla */
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Estilos generales de los 4 botones */
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        /* Efecto hover al colocar el mouse para los botones */
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Estilo para centrar el botón de "Eliminar Productos Seleccionados" */
+        .button-container {
+            display: flex;
+            justify-content: left; /* Centra el botón a la derecha */
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Crear Pedido</h1>
+    <form method="post">
+        {% csrf_token %}
+        
+        <label for="cliente">Cliente:</label>
+        <select name="cliente" id="cliente" required>
+            {% for cliente in clientes %}
+                <option value="{{ cliente.id }}">{{ cliente.nombre }} {{ cliente.apellido }}</option>
+            {% endfor %}
+        </select>
+        
+        <label for="producto">Producto:</label>
+        <select name="producto" id="producto" required>
+            {% for producto in productos %}
+                <option value="{{ producto.id }}">{{ producto.nombre }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="item_empresa">Empresa:</label>
+        <select name="item_empresa" id="item_empresa" required>
+            {% for empresa in empresas %}
+                <option value="{{ empresa.item_empresa }}">{{ empresa.nombre }} - {{ empresa.item_empresa }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="EstatusPed">Estatus del Pedido:</label>
+        <select name="EstatusPed" id="EstatusPed" required>
+            <option value="Solicitado">Solicitado</option>
+            <option value="Confirmado">Confirmado</option>
+            <option value="Entregado">Entregado</option>
+        </select>
+        
+        <label for="cantidad">Cantidad:</label>
+        <input type="number" name="cantidad" id="cantidad" value="1" min="1" required>
+
+        <!-- Contenedor separado para los botones -->
+        <div class="button-container"></div>
+        <button type="submit" name="agregar_producto">Agregar Producto</button>
+        <button type="submit" name="guardar_pedido">Guardar Pedido</button>
+        </div>
+    </form>
+
+    <h2>Productos Solicitados</h2>
+    <div class="centered-container">
+        <div class="content-box">
+            <form method="post">
+                {% csrf_token %}
+                <table>
+                    <tr>
+                        <th>Fecha del Pedido</th>
+                        <th>Nro Pedido</th>
+                        <th>Item Producto</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Nombre del Producto</th>
+                        <th>Valor Unitario</th>
+                        <th>Cantidad</th>
+                        <th>Val Producto</th>
+                        <th>Estatus del Pedido</th>
+                        <th>Acciones</th>
+                    </tr>
+                    {% for producto in productos_solicitados %}
+                    <tr>
+                        <td>{{ producto.fecha_pedido }}</td>
+                        <td>{{ producto.nro_pedido }}</td>
+                        <td>{{ producto.item_producto }}</td>
+                        <td>{{ cliente_seleccionado.nombre }}</td>
+                        <td>{{ cliente_seleccionado.apellido }}</td>
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.valor_unitario }}</td>
+                        <td>{{ producto.cantidad }}</td>
+                        <td>{{ producto.val_producto }}</td>
+                        <td>{{ producto.EstatusPed }}</td>
+                        <td>
+                            <input type="checkbox" name="eliminar_fila" value="{{ forloop.counter0 }}">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <!-- Contenedor que centra el botón de eliminar productos -->
+                <!-- Contenedor separado para los botones -->
+                <div class="button-container"></div>
+                    <button type="submit" name="eliminar_productos_seleccionados">Eliminar Productos Seleccionados</button>
+                    <button type="submit" name="limpiar_productos">Limpiar Productos Solicitados</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <h3>Total Pedido: {{ total_pedido }}</h3>
+
+    <!-- Botón de regreso a la página de inicio -->
+    <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
+
+
+</body>
+</html>

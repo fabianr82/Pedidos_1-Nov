@@ -92,6 +92,7 @@
             <th>Producto</th>
             <th>Compañía</th>
             <th>Estatus del Pedido</th>
+            <th>Actualizar Pedido</th>
         </tr>
         {% for pedido in pedidos %}
         <tr>
@@ -100,6 +101,12 @@
             <td>{{ pedido.producto.nombre }}</td>
             <td>{{ pedido.empresa.item_empresa }}</td>
             <td>{{ pedido.EstatusPed }}</td>
+            <td>
+                <!-- Enlace para ver los detalles y actualizar el estado -->
+                <a href="{% url 'detalle_pedido' nro_pedido=pedido.nro_pedido %}">Ver/Actualizar</a>
+            </td>
+
+
         </tr>
         {% empty %}
         <tr>
