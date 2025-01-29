@@ -104,18 +104,35 @@ def crear_user_sist(request):
         form = UserSistemForm()
     return render(request, 'pedidos/crear_user_sist.html', {'form': form})
 
+#@login_required
+#def crear_cliente(request):
+#    if request.method == 'POST':
+#        form = ClienteForm(request.POST)
+#        if form.is_valid():
+#            form.save()
+#            return redirect('ver_clientes')  # Redirige a la vista de clientes después de guardar
+#    else:
+#        form = ClienteForm()
+#    
+#    empresas = Empresa.objects.all()  # Obtener todas las empresas disponibles
+#    return render(request, 'pedidos/crear_cliente.html', {'form': form, 'empresas': empresas})
+
 @login_required
 def crear_cliente(request):
     if request.method == 'POST':
         form = ClienteForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('ver_clientes')  # Redirige a la vista de clientes después de guardar
+            cliente = form.save(commit=False)  # No guarda aún en la base de datos
+            cliente.direccion = request.POST.get('direccion')  # Captura la dirección manualmente
+            cliente.save()  # Guarda el cliente con la dirección
+            return redirect('ver_clientes')  # Redirige a la lista de clientes después de guardar
     else:
         form = ClienteForm()
     
     empresas = Empresa.objects.all()  # Obtener todas las empresas disponibles
-    return render(request, 'pedidos/crear_cliente.html', {'form': form, 'empresas': empresas})
+    clientes = Cliente.objects.all()  # Obtener todos los clientes existentes
+
+    return render(request, 'pedidos/crear_cliente.html', {'form': form, 'empresas': empresas, 'clientes': clientes})
 
 @login_required
 def crear_producto(request):
@@ -270,20 +287,26 @@ def enviar_mensajes(request):
 # Vista para la ubicación de clientes en Google Maps
 @login_required
 def ubicacion_clientes(request):
-    pedidos = Pedido.objects.select_related('cliente', 'producto').all()
-    clientes_data = []
+    # Obtener los pedidos y las relaciones necesarias
+    pedidos = Pedido.objects.select_related('cliente', 'item_empresa').prefetch_related('detalles__producto')
 
+    # Construir datos para los clientes y pedidos
+    clientes_data = []
     for pedido in pedidos:
+        cliente = pedido.cliente
         clientes_data.append({
-            'nombre': f"{pedido.cliente.nombre} {pedido.cliente.apellido}",
-            'coordenadas': pedido.cliente.coordenadas,
-            'pedido_info': f"Pedido ID: {pedido.id}, Producto: {pedido.producto.nombre}, Cantidad: {pedido.cantidad}",
-            'estatus_pedido': pedido.EstatusPed
+            'nombre': cliente.nombre,
+            'coordenadas': cliente.coordenadas,
+            'estatus_pedido': pedido.EstatusPed,
+            'pedido_info': f"Pedido {pedido.nro_pedido}, Total: {pedido.total}",
+            # Usa 'nro_pedido' en lugar de 'id' para el enlace
+            'url_detalle': f"/inicio/detalle_pedido/{pedido.nro_pedido}/",
         })
 
+    # Contexto para el template
     context = {
         'clientes_json': json.dumps(clientes_data),
-        'google_maps_api_key': settings.GOOGLE_MAPS_API_KEY
+        'google_maps_api_key': 'AIzaSyDEQafZcWfu0PjK-5uHQg6eHPW8FkdF50Y',
     }
     return render(request, 'pedidos/ubicacion_clientes.html', context)
 

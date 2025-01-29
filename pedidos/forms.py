@@ -15,10 +15,8 @@ class ClienteForm(forms.ModelForm):
     class Meta:
         model = Cliente
         fields = '__all__'
-        widgets = {
-            'item_empresa': forms.Select(attrs={'class': 'form-control'}),
-        }
-
+        exclude = ['direccion']  # Excluir el campo 'direccion'
+        
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto

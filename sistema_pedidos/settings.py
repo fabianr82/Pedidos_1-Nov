@@ -70,9 +70,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'pedidos',
         'USER': 'root',
-        'PASSWORD': '123ABCJG',
+        'PASSWORD': '12345',
         'HOST': 'localhost',  # Cambia si usas un host remoto
-        'PORT': '3307',
+        'PORT': '3306',
     }
 }
 

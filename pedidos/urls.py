@@ -35,4 +35,6 @@ urlpatterns = [
     # Rutas de Mensajes y Ubicación
     path('enviar_mensajes/', views.enviar_mensajes, name='enviar_mensajes'),
     path('ubicacion_clientes/', views.ubicacion_clientes, name='ubicacion_clientes'),
+    
+    path('productos/', views.productos, name='productos'),
 ]

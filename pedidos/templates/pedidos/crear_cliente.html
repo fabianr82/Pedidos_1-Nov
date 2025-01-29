@@ -2,7 +2,12 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear Cliente</title>
+
+    <!-- Carga la API de Google Maps con la biblioteca Places -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEQafZcWfu0PjK-5uHQg6eHPW8FkdF50Y&libraries=places"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,18 +78,45 @@
     <div class="form-container">
         <form method="post">
             {% csrf_token %}
-            <label for="item_empresa">Empresa:</label>
-            <select name="item_empresa" id="item_empresa" required>
-                {% for empresa in empresas %}
-                    <option value="{{ empresa.id }}">{{ empresa.nombre }} - {{ empresa.item_empresa }}</option>
-                {% endfor %}
-            </select>
-            
+
+            <!-- Renderiza automáticamente los campos del formulario sin duplicados -->
             {{ form.as_p }}
+
+            <!-- Campo de Dirección con Autocompletado -->
+            <label for="direccion">Dirección:</label>
+            <input type="text" id="direccion" name="direccion" class="form-control" placeholder="Escribe una dirección válida" required>
+
             <button type="submit">Guardar Cliente</button>
         </form>
     </div>
 
     <a href="{% url 'ver_clientes' %}" class="back-to-home">👤 Ver Clientes</a>
+
+    <script>
+        function initAutocomplete() {
+            let input = document.getElementById("direccion");
+            let autocomplete = new google.maps.places.Autocomplete(input, { types: ["geocode"] });
+
+            // Se activa el autocompletado solo si hay 5 o más caracteres
+            input.addEventListener("input", function () {
+                if (input.value.length >= 5) {
+                    autocomplete.setOptions({ strictBounds: false });
+                }
+            });
+
+            // Manejar la selección de dirección
+            autocomplete.addListener("place_changed", function() {
+                let place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    alert("Por favor selecciona una dirección válida de la lista.");
+                    return;
+                }
+
+                console.log("Dirección seleccionada:", place.formatted_address);
+            });
+        }
+
+        window.onload = initAutocomplete;
+    </script>
 </body>
 </html>

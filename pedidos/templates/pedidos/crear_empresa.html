@@ -2,7 +2,12 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crear Empresa</title>
+
+    <!-- Carga la API de Google Maps con la biblioteca Places -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEQafZcWfu0PjK-5uHQg6eHPW8FkdF50Y&libraries=places"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,20 +21,6 @@
 
         h1 {
             color: #333;
-        }
-
-        .back-to-home {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-            color: #4CAF50;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .back-to-home:hover {
-            color: #45a049;
         }
 
         .form-container {
@@ -54,7 +45,9 @@
         form input[type="tel"],
         form input[type="email"],
         form input[type="date"],
-        form textarea {
+        form textarea,
+        form select,
+        form datalist {
             width: 100%;
             padding: 8px;
             margin-bottom: 15px;
@@ -80,32 +73,6 @@
             background-color: #45a049;
         }
 
-        /* Estilo para el contenedor de Ciudad Empresa */
-        .ciudad-container {
-            display: flex;
-            align-items: center;
-            gap: 10px; /* Espacio entre los elementos */
-            margin-bottom: 20px; /* Espacio adicional entre el contenedor y el botón */
-        }
-
-        .ciudad-container input {
-            flex: 1; /* Permite que el input ocupe el espacio disponible */
-        }
-
-        .ciudad-container button {
-            background-color: #2196F3;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s ease;
-        }
-
-        .ciudad-container button:hover {
-            background-color: #1976D2;
-        }
     </style>
 </head>
 <body>
@@ -119,53 +86,40 @@
             {% csrf_token %}
 
             <label for="item_empresa">ID Empresa:</label>
-            <input type="text" name="item_empresa" id="item_empresa" value="ID Empresa"
-                   onfocus="if (this.value === 'ID Empresa') this.value = '';" 
-                   onblur="if (this.value === '') this.value = 'ID Empresa';" required>
-                   
+            <input type="text" name="item_empresa" id="item_empresa" required>
+
             <label for="nit">NIT:</label>
-            <input type="text" name="nit" id="nit" value="NIT Empresa"
-                   onfocus="if (this.value === 'NIT Empresa') this.value = '';" 
-                   onblur="if (this.value === '') this.value = 'NIT Empresa';" required>
+            <input type="text" name="nit" id="nit" required>
 
             <label for="nombre">Nombre:</label>
-            <input type="text" name="nombre" id="nombre" value="Nombre de la Empresa"
-                   onfocus="if (this.value === 'Nombre de la Empresa') this.value = '';" 
-                   onblur="if (this.value === '') this.value = 'Nombre de la Empresa';" required>
+            <input type="text" name="nombre" id="nombre" required>
 
+            <!-- Campo de Dirección con Autocompletado de Google Places -->
             <label for="direccion">Dirección:</label>
-            <input type="text" name="direccion" id="direccion" value="Dirección Empresa"
-                   onfocus="if (this.value === 'Dirección Empresa') this.value = '';" 
-                   onblur="if (this.value === '') this.value = 'Dirección Empresa';" required>
-
-            <label for="coord_emp">Coordenadas:</label>
-            <input type="text" name="coord_emp" id="coord_emp" value="Formato: Latitud, Longitud"
-                   onfocus="if (this.value === 'Formato: Latitud, Longitud') this.value = '';" 
-                   onblur="if (this.value === '') this.value = 'Formato: Latitud, Longitud';" required>
+            <input type="text" name="direccion" id="direccion" class="form-control" placeholder="Escribe una dirección válida" required>
 
             <label for="telefono">Teléfono:</label>
-            <input type="text" name="telefono" id="telefono" value="Número"
-                   onfocus="if (this.value === 'Número') this.value = '';" 
-                   onblur="if (this.value === '') this.value = 'Número';" required>
+            <input type="text" name="telefono" id="telefono" required>
 
             <label for="ciudad_emp">Ciudad Empresa:</label>
-            <div class="ciudad-container">
-                <input list="ciudades" name="ciudad_emp" id="ciudad_emp" placeholder="Escribe o selecciona una ciudad" required>
-                <datalist id="ciudades">
-                    <option value="BOGOTÁ D.C.">BOGOTÁ D.C.</option>
-                    <option value="MANTA">MANTA</option>
-                    <option value="TUNJA">TUNJA</option>
-                    <option value="BELÉN">BELÉN</option>
-                    <option value="MEDELLÍN">MEDELLÍN</option>
-                    <option value="CALI">CALI</option>
-                    <option value="BARRANQUILLA">BARRANQUILLA</option>
-                    <option value="CARTAGENA">CARTAGENA</option>
-                    <option value="BUCARAMANGA">BUCARAMANGA</option>
-                    <option value="MANIZALES">MANIZALES</option>
-                    <option value="PEREIRA">PEREIRA</option>
-                    <option value="IBAGUÉ">IBAGUÉ</option>
-                    <option value="SANTA MARTA">SANTA MARTA</option>
-                </datalist>
+            <input list="ciudades" name="ciudad_emp" id="ciudad_emp" placeholder="Escribe o selecciona una ciudad" required>
+            <datalist id="ciudades">
+                <option value="BOGOTÁ D.C.">BOGOTÁ D.C.</option>
+                <option value="MANTA">MANTA</option>
+                <option value="TUNJA">TUNJA</option>
+                <option value="BELÉN">BELÉN</option>
+                <option value="MEDELLÍN">MEDELLÍN</option>
+                <option value="CALI">CALI</option>
+                <option value="BARRANQUILLA">BARRANQUILLA</option>
+                <option value="CARTAGENA">CARTAGENA</option>
+                <option value="BUCARAMANGA">BUCARAMANGA</option>
+                <option value="MANIZALES">MANIZALES</option>
+                <option value="PEREIRA">PEREIRA</option>
+                <option value="IBAGUÉ">IBAGUÉ</option>
+                <option value="SANTA MARTA">SANTA MARTA</option>
+            </datalist>
+
+            <div style="background: rgb(250, 250, 250); padding: 20px;">
             </div>
 
             <button type="submit">Guardar Empresa</button>
@@ -173,5 +127,32 @@
     </div>
     
     <a href="{% url 'ver_empresas' %}" class="back-to-home">🏢 Ver Empresas</a>
+
+    <script>
+        function initAutocomplete() {
+            let input = document.getElementById("direccion");
+            let autocomplete = new google.maps.places.Autocomplete(input, { types: ["geocode"] });
+
+            // Se activa el autocompletado solo si hay 5 o más caracteres
+            input.addEventListener("input", function () {
+                if (input.value.length >= 5) {
+                    autocomplete.setOptions({ strictBounds: false });
+                }
+            });
+
+            // Manejar la selección de dirección
+            autocomplete.addListener("place_changed", function() {
+                let place = autocomplete.getPlace();
+                if (!place.geometry) {
+                    alert("Por favor selecciona una dirección válida de la lista.");
+                    return;
+                }
+
+                console.log("Dirección seleccionada:", place.formatted_address);
+            });
+        }
+
+        window.onload = initAutocomplete;
+    </script>
 </body>
 </html>

@@ -44,7 +44,7 @@ class Empresa(models.Model):
     # Agrega otros campos necesarios
 
     def __str__(self):
-        return f"{self.nombre} ({self.nit})"
+        return f"{self.nombre} ({self.nit}) ({self.item_empresa})"
 
 class UserSistem(models.Model):
     # Define los campos para el modelo UserSistem
@@ -55,21 +55,23 @@ class UserSistem(models.Model):
         return self.nombre
 
 class Cliente(models.Model):
-    nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=100)
-    documento = models.CharField(max_length=20, unique=True)
-    direccion = models.CharField(max_length=200)
-    coordenadas = models.CharField(max_length=50)  # Para almacenar latitud y longitud
-    telefono = models.CharField(max_length=20)
-    whatsapp = models.CharField(max_length=20)
-    zona = models.CharField(max_length=50)
-    metodo_pago = models.CharField(max_length=50)
     item_empresa = models.ForeignKey(
         'Empresa',  # Referencia al modelo Empresa
         on_delete=models.CASCADE,
         default=1  # ID predeterminado de una Empresa existente
     )
-
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=100)
+    documento = models.CharField(max_length=20, unique=True)
+    direccion = models.CharField(max_length=200)  # Dirección seleccionada de Google Places
+    
+    #coordenadas = models.CharField(max_length=50)  # Para almacenar latitud y longitud
+    coordenadas = models.CharField(max_length=50, blank=True, null=True)  # Guardar latitud y longitud
+       
+    telefono = models.CharField(max_length=20)
+    whatsapp = models.CharField(max_length=20)
+    zona = models.CharField(max_length=50)
+    metodo_pago = models.CharField(max_length=50)
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
 
@@ -109,7 +111,8 @@ class Pedido(models.Model):
     EstatusPed = models.CharField(max_length=20, choices=[
         ('Solicitado', 'Solicitado'),
         ('Pagado', 'Pagado'),
-        ('Entregado', 'Entregado')
+        ('Entregado', 'Entregado'),
+        ('Pagado', 'Pagado')
     ])
     
     fecha_pedido = models.DateField(default=timezone.now)
