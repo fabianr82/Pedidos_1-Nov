@@ -46,7 +46,7 @@ ROOT_URLCONF = 'sistema_pedidos.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -68,7 +68,7 @@ WSGI_APPLICATION = 'sistema_pedidos.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'bda_ped',
+        'NAME': 'pedidos',
         'USER': 'root',
         'PASSWORD': '12345',
         'HOST': 'localhost',  # Cambia si usas un host remoto

@@ -19,65 +19,120 @@
             margin-bottom: 20px;
         }
 
-        .company-list {
-            width: 100%;
-            max-width: 600px;
+        .empresa-list {
             background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
             padding: 20px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
 
-        .company-item {
-            padding: 10px;
+        .empresa-item {
             border-bottom: 1px solid #ddd;
+            padding: 15px 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .company-item:last-child {
+        .empresa-item:last-child {
             border-bottom: none;
         }
 
-        .delete-button {
-            background-color: #FF5733;
+        .empresa-info {
+            flex: 3;
+        }
+
+        .empresa-actions {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        button {
+            background-color: #4CAF50;
             color: white;
             border: none;
-            padding: 10px 15px;
+            padding: 8px 12px;
             font-size: 1rem;
             cursor: pointer;
             border-radius: 4px;
             transition: background-color 0.3s ease;
         }
 
-        .delete-button:hover {
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .btn-delete {
+            background-color: #FF5733;
+        }
+
+        .btn-delete:hover {
             background-color: #E74C3C;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        a:hover {
+            color: #45a049;
         }
     </style>
 </head>
 <body>
-    <!-- Icono para regresar al inicio -->
-    <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
+    <!-- Botón para volver al inicio -->
+    <a href="{% url 'inicio' %}">🏠 Volver al Inicio</a>
 
     <h1>Empresas</h1>
 
-    <div class="company-list">
+    <div class="empresa-list">
         {% for empresa in empresas %}
-            <div class="company-item">
-                <strong>{{ empresa.nombre }}</strong><br>
-                Dirección: {{ empresa.direccion }}<br>
-                NIT: {{ empresa.nit }}<br>
-                Ciudad: {{ empresa.ciudad_emp }}<br>
-                Coordenadas: {{ empresa.coord_emp }}<br>
-                Teléfono: {{ empresa.telefono }}<br>
-                Item Empresa: {{ empresa.item_empresa }}
+        <div class="empresa-item">
+            <!-- Checkbox para seleccionar la empresa -->
+            <input type="checkbox" name="selected_empresas" value="{{ empresa.id }}">
+            
+            <!-- Información de la empresa -->
+            <div class="empresa-info">
+                <p><strong>{{ empresa.nombre }}</strong></p>
+                <p>Item Empresa: {{ empresa.item_empresa }}</p>
+                <p>NIT: {{ empresa.nit }}</p>
+                <p>Dirección: {{ empresa.direccion }}</p>
+                <p>Ciudad: {{ empresa.ciudad_emp }}</p>
+                <p>Coordenadas: {{ empresa.coord_emp }}</p>
+                <p>Teléfono: {{ empresa.telefono }}</p>
             </div>
-        {% empty %}
-            <p>No hay empresas registradas.</p>
+
+            <!-- Botones de acciones separados -->
+            <div class="empresa-actions">
+                <!-- Formulario para editar -->
+                <form method="get" action="{% url 'editar_empresa' empresa.id %}">
+                    <button type="submit" class="btn-edit">Editar</button>
+                </form>
+
+                <!-- Formulario para eliminar -->
+                <form method="post" action="{% url 'gestionar_empresas' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="eliminar_{{ empresa.id }}">
+                    <button type="submit" class="btn-delete">Eliminar</button>
+                </form>
+            </div>
+        </div>
         {% endfor %}
     </div>
 
-    <a href="{% url 'crear_empresa' %}">Crear Empresa</a>
+    <!-- Botón para crear una nueva empresa -->
+    <a href="{% url 'crear_empresa' %}">🏢 Crear Empresa</a>
 </body>
 </html>

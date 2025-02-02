@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ubicación Pedidos</title>
     <style>
         body {
@@ -41,18 +42,28 @@
             color: #45a049;
         }
     </style>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDEQafZcWfu0PjK-5uHQg6eHPW8FkdF50Y"></script>
     <script>
         function initMap() {
+            // Centro del mapa
             var centro = { lat: 4.686997, lng: -74.056924 };  // Bogotá, Colombia
 
+            // Crear el mapa
             var map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 11,
                 center: centro
             });
 
-            var clientes = JSON.parse('{{ clientes_json|escapejs }}');
+            // Convertir los datos de clientes a un objeto de JavaScript
+            var clientes;
+            try {
+                clientes = JSON.parse('{{ clientes_json|escapejs }}');
+            } catch (e) {
+                console.error("Error al parsear datos de clientes:", e);
+                clientes = [];
+            }
 
+            // Iterar sobre los clientes para agregar marcadores
             clientes.forEach(function(cliente) {
                 var coords = cliente.coordenadas.split(',');
                 var latitud = parseFloat(coords[0].trim());
@@ -64,7 +75,7 @@
                     case 'Solicitado':
                         iconUrl = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
                         break;
-                    case 'Confirmado':
+                    case 'Pagado':
                         iconUrl = 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
                         break;
                     case 'Entregado':
@@ -74,6 +85,7 @@
                         iconUrl = 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png';
                 }
 
+                // Crear el marcador
                 var marker = new google.maps.Marker({
                     position: { lat: latitud, lng: longitud },
                     map: map,
@@ -81,17 +93,22 @@
                     icon: iconUrl
                 });
 
+                // Crear la ventana de información
                 var infoWindow = new google.maps.InfoWindow({
                     content: `<div>
                                 <strong>${cliente.nombre}</strong><br>
                                 Pedido: ${cliente.pedido_info}<br>
                                 Estatus: ${cliente.estatus_pedido}<br>
-                                <a href="https://www.google.com/maps/dir/?api=1&destination=${latitud},${longitud}" target="_blank">
-                                    Ver ruta en Google Maps
+                                <a href="https://www.google.com/maps/search/?api=1&query=${latitud},${longitud}" target="_blank">
+                                    Ver ubicación en Google Maps
+                                </a><br>
+                                <a href="${cliente.url_detalle}" target="_blank">
+                                    Ver detalles del pedido
                                 </a>
                               </div>`
                 });
 
+                // Agregar evento de clic al marcador
                 marker.addListener('click', function() {
                     infoWindow.open(map, marker);
                 });
@@ -100,10 +117,13 @@
     </script>
 </head>
 <body onload="initMap()">
-    <!-- Icono para regresar al inicio -->
+    <!-- Enlace para regresar al inicio -->
     <a href="{% url 'inicio' %}" class="back-to-home">🏠 Volver al Inicio</a>
     
+    <!-- Título -->
     <h1>Ubicación Pedidos</h1>
+    
+    <!-- Contenedor del mapa -->
     <div id="map"></div>
 </body>
 </html>
