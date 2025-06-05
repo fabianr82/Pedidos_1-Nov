@@ -1,5 +1,5 @@
 from django import forms
-from .models import Empresa, UserSistem, Cliente, Producto, Pedido, Portada
+from .models import Empresa, UserSistem, Cliente, Producto, Pedido, Portada, DetallePedido
 
 class EmpresaForm(forms.ModelForm):
     class Meta:
@@ -12,8 +12,6 @@ class UserSistemForm(forms.ModelForm):
         fields = '__all__'
 
 class ClienteForm(forms.ModelForm):
-
-    # Definir las opciones para el campo 'zona'
     ZONA_CHOICES = [
         ('Otra', 'Otra'),
         ('NA', 'NA'),
@@ -39,7 +37,6 @@ class ClienteForm(forms.ModelForm):
         ('Sumapaz', 'Sumapaz'),
     ]
 
-    # Campo zona que usa un Select para elegir entre las opciones de ZONA_CHOICES
     zona = forms.ChoiceField(choices=ZONA_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
 
     class Meta:
@@ -79,10 +76,50 @@ class ProductoForm(forms.ModelForm):
 class PedidoForm(forms.ModelForm):
     class Meta:
         model = Pedido
-        fields = '__all__'
+        fields = ['fecha_pedido', 'cliente', 'estado']  # Campos necesarios
+        labels = {
+            'fecha_pedido': 'Fecha del Pedido',
+            'cliente': 'Cliente',
+            'estado': 'Estado del Pedido',
+        }
+        widgets = {
+            'fecha_pedido': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'cliente': forms.Select(attrs={'class': 'form-control'}),
+            'estado': forms.Select(attrs={
+                'class': 'form-control',
+                'choices': [
+                    ('Solicitado', 'Solicitado'),
+                    ('Confirmado', 'Confirmado'),
+                    ('Enviado', 'Enviado'),
+                    ('Entregado', 'Entregado'),
+                ]
+            }),
+        }
 
 # Clase PortadaForm para cargar portadas
 class PortadaForm(forms.ModelForm):
     class Meta:
         model = Portada
         fields = ['imagen', 'descripcion']  # Ajusta los campos según tu modelo
+
+class DetallePedidoForm(forms.ModelForm):
+    class Meta:
+        model = DetallePedido
+        fields = ['producto', 'cantidad', 'item_pedido']  # Añadimos item_pedido
+        labels = {
+            'producto': 'Producto',
+            'cantidad': 'Cantidad',
+            'item_pedido': 'Nro de Ítem',
+        }
+        widgets = {
+            'producto': forms.Select(attrs={'class': 'form-control'}),
+            'cantidad': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'item_pedido': forms.NumberInput(attrs={'class': 'form-control', 'readonly': 'readonly'}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        cantidad = cleaned_data.get("cantidad")
+        if cantidad and cantidad <= 0:
+            raise ValidationError("La cantidad debe ser mayor a 0.")
+        return cleaned_data

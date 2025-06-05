@@ -48,6 +48,7 @@ class UserSistem(models.Model):
         return self.nombre
 
 class Cliente(models.Model):
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)  # Relación con User
     item_empresa = models.ForeignKey(Empresa, on_delete=models.SET_NULL, null=True, blank=True)
     cliente_id = models.CharField(max_length=10, primary_key=True, default="ID Cliente")  # Establecer como llave primaria
     nombre = models.CharField(max_length=100)
@@ -92,56 +93,61 @@ class Producto(models.Model):
     descripcion = models.TextField()
     valor_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_vencimiento = models.DateField()
-    item_producto = models.CharField(max_length=10, primary_key=True, unique=True)
+    item_producto = models.CharField(max_length=10, primary_key=True)
     UM = models.CharField(max_length=10)
     empresa = models.ForeignKey(Empresa, to_field='item_empresa', on_delete=models.CASCADE, related_name='productos')
 
     def __str__(self):
         return f"{self.nombre} ({self.marca})"
 
-# Modelo Pedido
 class Pedido(models.Model):
-    nro_pedido = models.IntegerField(default=1, primary_key=True)
-    item_pedido = models.IntegerField(default=1)
-
-    # Relacionar con cliente usando el campo cliente_id
-    cliente = models.ForeignKey(
-        Cliente,
-        to_field='cliente_id',  # Usar el campo 'cliente_id' para la relación
-        on_delete=models.CASCADE
+    nro_pedido = models.AutoField(primary_key=True)  # Número autoincremental del pedido
+    fecha_pedido = models.DateField(default=timezone.now)  # Fecha de creación
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)  # Cliente asociado al pedido
+    estado = models.CharField(
+        max_length=20,
+        choices=[
+            ('Solicitado', 'Solicitado'),
+            ('Confirmado', 'Confirmado'),
+            ('Enviado', 'Enviado'),
+            ('Entregado', 'Entregado')
+        ],
+        default='Solicitado'
     )
+    total_pedido = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
-    producto = models.ForeignKey('Producto', on_delete=models.CASCADE)
-
-    # Relacionar el pedido con la empresa correspondiente
-    item_empresa = models.ForeignKey(Empresa, on_delete=models.SET_NULL, null=True, blank=True)
-
-    EstatusPed = models.CharField(max_length=20, choices=[
-        ('Solicitado', 'Solicitado'),
-        ('Confirmado', 'Confirmado'),
-        ('Entregado', 'Entregado')
-    ])
-
-    cantidad = models.PositiveIntegerField(default=1)
-    fecha_pedido = models.DateField(default=timezone.now)
-
-    class Meta:
-        unique_together = ('nro_pedido', 'item_pedido')
-
-    def save(self, *args, **kwargs):
-        if not self.nro_pedido:
-            last_pedido = Pedido.objects.order_by('-nro_pedido').first()
-            self.nro_pedido = last_pedido.nro_pedido + 1 if last_pedido else 1
-
-        if not self.item_pedido:
-            max_item = Pedido.objects.filter(nro_pedido=self.nro_pedido).count()
-            self.item_pedido = max_item + 1
-
-        super(Pedido, self).save(*args, **kwargs)
+    def actualizar_total(self):
+        """
+        Suma todos los subtotales de los detalles asociados y actualiza el total.
+        """
+        self.total_pedido = sum(detalle.subtotal for detalle in self.detalles.all())  # Usamos related_name
+        self.save()
 
     def __str__(self):
-        return f"Pedido {self.id} - Cliente: {self.cliente.nombre} {self.cliente.apellido} - Producto: {self.producto.nombre}"
+        return f"Pedido {self.nro_pedido} - Cliente: {self.cliente.nombre}"
 
-    @property
-    def val_producto(self):
-        return self.producto.valor_unitario * self.cantidad
+class DetallePedido(models.Model):
+    pedido = models.ForeignKey(
+        Pedido, 
+        on_delete=models.CASCADE, 
+        related_name="detalles"  # Acceso desde Pedido
+    )
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    item_pedido = models.PositiveIntegerField(default=1)  # Incremental automático
+    cantidad = models.PositiveIntegerField(default=1)
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def save(self, *args, **kwargs):
+        """
+        Calcula automáticamente item_pedido, precio_unitario y subtotal antes de guardar.
+        """
+        if not self.pk:  # Solo se calcula al crear un nuevo detalle
+            self.item_pedido = self.pedido.detalles.count() + 1  # Cuenta ítems ya existentes
+        self.precio_unitario = self.producto.valor_unitario
+        self.subtotal = self.cantidad * self.precio_unitario
+        super().save(*args, **kwargs)
+        self.pedido.actualizar_total()  # Actualiza el total del pedido
+
+    def __str__(self):
+        return f"Item {self.item_pedido} - {self.producto.nombre} ({self.cantidad} unidades)"

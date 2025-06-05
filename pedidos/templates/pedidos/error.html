@@ -1,0 +1,30 @@
+def crear_pedido(request):
+    # Verificar si el usuario actual está asociado a un cliente
+    try:
+        cliente = Cliente.objects.get(usuario=request.user)
+    except Cliente.DoesNotExist:
+        return render(request, 'pedidos/error.html', {'mensaje': 'El usuario actual no está asociado a un cliente.'})
+
+    # Obtener o crear el pedido
+    pedido, created = Pedido.objects.get_or_create(cliente=cliente, estado='Solicitado')
+    detalles = pedido.detallepedido_set.all()
+
+    if request.method == "POST" and request.is_ajax():
+        detalle_form = DetallePedidoForm(request.POST)
+        if detalle_form.is_valid():
+            detalle = detalle_form.save(commit=False)
+            detalle.pedido = pedido
+            detalle.save()
+            return JsonResponse({'success': True, 'html': render_to_string('pedidos/_tabla_detalles.html', {'detalles': detalles, 'pedido': pedido})})
+        else:
+            return JsonResponse({'success': False, 'error': 'Error al agregar el producto.'})
+
+    form = PedidoForm(instance=pedido)
+    detalle_form = DetallePedidoForm()
+
+    return render(request, 'pedidos/crear_pedido.html', {
+        'form': form,
+        'detalle_form': detalle_form,
+        'detalles': detalles,
+        'pedido': pedido
+    })

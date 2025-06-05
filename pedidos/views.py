@@ -1,14 +1,24 @@
-from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.contrib import messages
-from .forms import EmpresaForm, UserSistemForm, ClienteForm, ProductoForm, PedidoForm, PortadaForm
 from .models import Empresa, UserSistem, Cliente, Producto, Pedido, Portada
-from django.core.exceptions import ValidationError
-import json
+from django.http import JsonResponse
 from datetime import datetime
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+from django.template.loader import render_to_string
+from .forms import EmpresaForm, UserSistemForm, ClienteForm, ProductoForm, PedidoForm, PortadaForm, DetallePedidoForm
+from .models import Empresa, UserSistem, Cliente, Producto, Pedido, Portada, DetallePedido
+from django.core.exceptions import ValidationError
+import json
+from django.db.models import Max
+from pedidos import models
+from django.db import models
+from django.views.decorators.csrf import csrf_exempt
+from django.db import transaction
+
+
 
 # Vista para la página de inicio
 @login_required
@@ -152,107 +162,21 @@ def crear_producto(request):
     })
 
 @login_required
-def crear_pedido(request):
-    productos_solicitados = request.session.get('productos_solicitados', [])
-    total_pedido = sum(producto['val_producto'] for producto in productos_solicitados)
-
+def limpiar_productos(request):
     if request.method == 'POST':
-        if 'limpiar_productos' in request.POST:
-            request.session['productos_solicitados'] = []
-            messages.success(request, "Productos solicitados eliminados correctamente.")
-            return redirect('crear_pedido')
+        request.session['productos_solicitados'] = []
+        messages.success(request, "Productos solicitados eliminados correctamente.")
+    
+    return redirect('crear_pedido')
 
-        if 'eliminar_productos_seleccionados' in request.POST:
-            indices_a_eliminar = request.POST.getlist('eliminar_fila')
-            if indices_a_eliminar:
-                indices_a_eliminar = sorted([int(i) for i in indices_a_eliminar], reverse=True)
-                for index in indices_a_eliminar:
-                    if 0 <= index < len(productos_solicitados):
-                        productos_solicitados.pop(index)
-                request.session['productos_solicitados'] = productos_solicitados
-                messages.success(request, "Productos seleccionados eliminados correctamente.")
-
-            total_pedido = sum(producto['val_producto'] for producto in productos_solicitados)
-
-        elif 'agregar_producto' in request.POST:
-            item_empresa = request.POST.get('item_empresa')  # Cambié el nombre de la variable para mayor claridad
-            producto_id = request.POST.get('producto')
-            cantidad = int(request.POST.get('cantidad', 1))
-            estatus_pedido = request.POST.get('EstatusPed')
-
-            if producto_id and cantidad > 0:
-                producto = get_object_or_404(Producto, id=producto_id)
-                
-                # Obtener la instancia de Empresa en lugar de usar solo el ID
-                #empresa = get_object_or_404(Empresa, id=item_empresa_id)
-
-                val_producto = float(producto.valor_unitario) * cantidad
-                nro_pedido = request.session.get('nro_pedido', 1)
-                item_pedido = len(productos_solicitados) + 1
-
-                productos_solicitados.append({
-                    'id': producto.id,
-                    'nro_pedido': nro_pedido,
-                    'item_empresa': empresa,  # Asignar la instancia completa de Empresa
-                    'item_pedido': item_pedido,
-                    'nombre': producto.nombre,
-                    'marca': producto.marca,
-                    'descripcion': producto.descripcion,
-                    'UM': producto.UM,
-                    'valor_unitario': float(producto.valor_unitario),
-                    'cantidad': cantidad,
-                    'val_producto': val_producto,
-                    'fecha_pedido': datetime.now().strftime('%Y-%m-%d'),
-                    'EstatusPed': estatus_pedido
-                })
-                request.session['productos_solicitados'] = productos_solicitados
-                messages.success(request, "Producto agregado a la lista.")
-
-            total_pedido = sum(producto['val_producto'] for producto in productos_solicitados)
-
-        elif 'guardar_pedido' in request.POST:
-            cliente_id = request.POST.get('cliente')
-            estatus_pedido = request.POST.get('EstatusPed')
-            fecha_pedido = timezone.now().strftime('%Y-%m-%d')
-
-            if cliente_id and productos_solicitados:
-                cliente = get_object_or_404(Cliente, id=cliente_id)
-
-                for producto_data in productos_solicitados:
-                    producto = get_object_or_404(Producto, id=producto_data['id'])
-                    
-                    ultimo_pedido = Pedido.objects.filter(nro_pedido=producto_data['nro_pedido']).order_by('-item_pedido').first()
-                    item_pedido = (ultimo_pedido.item_pedido + 1) if ultimo_pedido else 1
-
-                    # Obtener la instancia de Empresa antes de crear el pedido
-                    empresa = get_object_or_404(Empresa, id=producto_data['item_empresa'].id)
-
-                    Pedido.objects.create(
-                        item_empresa=empresa,
-                        nro_pedido=producto_data['nro_pedido'],
-                        cliente=cliente,
-                        producto=producto,
-                        EstatusPed=estatus_pedido,
-                        cantidad=producto_data['cantidad'],
-                        fecha_pedido=fecha_pedido,
-                        item_pedido=item_pedido
-                    )
-
-                request.session['productos_solicitados'] = []
-                messages.success(request, "Pedido guardado correctamente.")
-                return redirect('inicio')
-
-    productos = Producto.objects.all()
-    clientes = Cliente.objects.all()
-    empresas = Empresa.objects.all()  # Asegúrate de pasar todas las empresas al contexto
-
-    return render(request, 'pedidos/crear_pedido.html', {
-        'productos': productos,
-        'clientes': clientes,
-        'empresas': empresas,
-        'productos_solicitados': productos_solicitados,
-        'total_pedido': total_pedido,
-    })
+@login_required
+def guardar_pedido(request):
+    if request.method == "POST":
+        pedido_id = request.POST.get('pedido_id')  # El nombre correcto del campo enviado
+        pedido = get_object_or_404(Pedido, nro_pedido=pedido_id)  # Ajustar a nro_pedido
+        pedido.estado = 'Confirmado'  # Cambiar el estado a Confirmado
+        pedido.save()  # Guardar cambios
+        return JsonResponse({"success": True, "message": "Pedido guardado correctamente."})
 
 # Vistas para listar entidades
 @login_required
@@ -277,8 +201,9 @@ def ver_clientes(request):
 
 @login_required
 def ver_pedidos(request):
-    pedidos = Pedido.objects.all()
-    return render(request, 'pedidos/ver_pedidos.html', {'pedidos': pedidos})
+    pedidos = Pedido.objects.select_related('cliente', 'producto', 'item_empresa').all()
+    total_pedido = sum(pedido.val_producto for pedido in pedidos)
+    return render(request, 'pedidos/ver_pedidos.html', {'pedidos': pedidos, 'total_pedido': total_pedido})
 
 # Vista para enviar mensajes
 @login_required
@@ -325,7 +250,6 @@ def productos(request):        # Acá se toman los productos del catálogo en im
 
 # Vistas para editar y eliminar productos en un pedido
 @login_required
-@login_required
 def editar_producto(request, item_producto):
     producto = get_object_or_404(Producto, item_producto=item_producto)
     empresas = Empresa.objects.all()
@@ -351,12 +275,16 @@ def editar_producto(request, item_producto):
     })
 
 @login_required
-def eliminar_producto(request):
+def eliminar_producto(request, producto_index):
     if request.method == 'POST':
-        productos_a_eliminar = request.POST.getlist('eliminar[]')
-        Producto.objects.filter(item_producto__in=productos_a_eliminar).delete()
-        messages.success(request, "Productos eliminados correctamente.")
-    return redirect('ver_productos')
+        productos_solicitados = request.session.get('productos_solicitados', [])
+
+        if 0 <= producto_index < len(productos_solicitados):
+            productos_solicitados.pop(producto_index)
+            request.session['productos_solicitados'] = productos_solicitados
+            messages.success(request, "Producto eliminado correctamente.")
+
+    return redirect('crear_pedido')
 
 @login_required
 def eliminar_empresas(request):
@@ -411,3 +339,130 @@ def limpiar_clientes(request):
         Cliente.objects.all().delete()  # Elimina todos los clientes de la base de datos
         messages.success(request, "Lista de clientes limpiada exitosamente.")
     return redirect('ver_clientes')
+
+@login_required
+def eliminar_detalle(request, detalle_id):
+    detalle = get_object_or_404(DetallePedido, id=detalle_id)
+    detalle.delete()
+    return JsonResponse({'success': True})
+
+@csrf_exempt
+def agregar_producto(request):
+    if request.method == "POST" and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        producto_id = request.POST.get("producto_id")
+        cantidad = int(request.POST.get("cantidad"))
+        pedido_id = request.POST.get("pedido_id")
+
+        # Obtener el pedido y el producto
+        pedido = get_object_or_404(Pedido, nro_pedido=pedido_id)
+        producto = get_object_or_404(Producto, item_producto=producto_id)
+
+        # Calcular el item_pedido incremental
+        item_pedido_count = DetallePedido.objects.filter(pedido=pedido).count() + 1
+
+        # Crear un nuevo detalle del pedido
+        DetallePedido.objects.create(
+            pedido=pedido,
+            producto=producto,
+            item_pedido=item_pedido_count,
+            cantidad=cantidad,
+            precio_unitario=producto.valor_unitario,
+            subtotal=cantidad * producto.valor_unitario
+        )
+
+        # Actualizar el total del pedido
+        pedido.actualizar_total()
+
+        # Renderizar la tabla actualizada
+        detalles = pedido.detallepedido_set.all()
+        html = render_to_string("pedidos/_tabla_detalles.html", {"detalles": detalles})
+        return JsonResponse({
+            "success": True,
+            "html": html,
+            "total_pedido": pedido.total_pedido
+        })
+    return JsonResponse({"success": False, "error": "Error al agregar producto"})
+    
+@login_required
+def crear_pedido(request):
+    if request.method == "POST" and request.headers.get("x-requested-with") == "XMLHttpRequest":
+        # Datos del formulario
+        cliente_id = request.POST.get("cliente_id")
+        producto_id = request.POST.get("producto_id")
+        cantidad = int(request.POST.get("cantidad", 1))
+
+        # Validación del cliente y producto
+        cliente = get_object_or_404(Cliente, pk=cliente_id)
+        producto = get_object_or_404(Producto, pk=producto_id)
+
+        # Crear o recuperar el pedido
+        pedido, created = Pedido.objects.get_or_create(cliente=cliente, estado="Solicitado")
+
+        # Calcular el item_pedido incremental
+        item_pedido_count = DetallePedido.objects.filter(pedido=pedido).count() + 1
+
+        # Crear el detalle del pedido
+        DetallePedido.objects.create(
+            pedido=pedido,
+            producto=producto,
+            item_pedido=item_pedido_count,
+            cantidad=cantidad,
+            precio_unitario=producto.valor_unitario,
+            subtotal=cantidad * producto.valor_unitario
+        )
+
+        # Actualizar el total del pedido
+        pedido.actualizar_total()
+
+        # Renderizar la tabla de productos actualizada
+        detalles = pedido.detalles.all()
+        html = render_to_string("pedidos/_tabla_detalles.html", {"detalles": detalles, "pedido": pedido})
+
+        return JsonResponse({"success": True, "html": html})
+
+    # En caso de GET, cargar los clientes y productos
+    clientes = Cliente.objects.all()
+    productos = Producto.objects.all()
+    return render(request, "pedidos/crear_pedido.html", {"clientes": clientes, "productos": productos})
+
+@login_required
+def crear_pedido(request):
+    if request.method == "POST" and request.headers.get("x-requested-with") == "XMLHttpRequest":
+        # Datos del formulario
+        cliente_id = request.POST.get("cliente_id")
+        producto_id = request.POST.get("producto_id")
+        cantidad = int(request.POST.get("cantidad", 1))
+
+        # Validación del cliente y producto
+        cliente = get_object_or_404(Cliente, pk=cliente_id)
+        producto = get_object_or_404(Producto, pk=producto_id)
+
+        # Crear o recuperar el pedido
+        pedido, created = Pedido.objects.get_or_create(cliente=cliente, estado="Solicitado")
+
+        # Calcular el item_pedido incremental
+        item_pedido_count = DetallePedido.objects.filter(pedido=pedido).count() + 1
+
+        # Crear el detalle del pedido
+        DetallePedido.objects.create(
+            pedido=pedido,
+            producto=producto,
+            item_pedido=item_pedido_count,
+            cantidad=cantidad,
+            precio_unitario=producto.valor_unitario,
+            subtotal=cantidad * producto.valor_unitario
+        )
+
+        # Actualizar el total del pedido
+        pedido.actualizar_total()
+
+        # Renderizar la tabla de productos actualizada
+        detalles = pedido.detalles.all()
+        html = render_to_string("pedidos/_tabla_detalles.html", {"detalles": detalles, "pedido": pedido})
+
+        return JsonResponse({"success": True, "html": html})
+
+    # En caso de GET, cargar los clientes y productos
+    clientes = Cliente.objects.all()
+    productos = Producto.objects.all()
+    return render(request, "pedidos/crear_pedido.html", {"clientes": clientes, "productos": productos})
